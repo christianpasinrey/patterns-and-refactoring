@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-skill-8A63D2)](https://docs.claude.com/en/docs/claude-code)
 [![Plugin](https://img.shields.io/badge/plugin-refactoring--guru%40christianpasinrey-8A63D2)](#recommended--plugin-from-the-marketplace)
+[![Version](https://img.shields.io/badge/version-1.1.1-8A63D2)](#changelog)
 [![Standalone](https://img.shields.io/badge/dependencies-none-brightgreen)](#installation)
 [![Catalogues](https://img.shields.io/badge/catalogues-8-blue)](#whats-inside)
 [![References](https://img.shields.io/badge/reference%20files-26-blue)](#repository-layout)
@@ -25,6 +26,7 @@
 - [Usage](#usage)
 - [Repository layout](#repository-layout)
 - [Design decisions](#design-decisions)
+- [Changelog](#changelog)
 - [Contributing](#contributing)
 - [Attribution and sources](#attribution-and-sources)
 - [License](#license)
@@ -100,10 +102,11 @@ Those five behaviours are exactly what this skill encodes. AI assistants are now
 
 ## How it works
 
-Three entry paths, one triage gate, one audit at the end.
+One triage gate, three entry paths, one audit at the end.
 
 ```mermaid
 flowchart TD
+    S["<b>0 · Triage</b> · <b>0.5 · Read the room</b><br/><i>detect the stack, find the codebase's convention</i>"] --> T
     T{What triggered this?} -->|New code to design| A["<b>Path A</b><br/>Force → Pattern"]
     T -->|Existing code that hurts| B["<b>Path B</b><br/>Smell → Refactoring"]
     T -->|Someone else's design or PR| C["<b>Path C</b><br/>Review"]
@@ -130,6 +133,7 @@ flowchart TD
     Z --> V["<b>6 · Verify</b><br/>audit the code against the decision"]
     C3 --> V
 
+    style S fill:#6e7781,color:#fff
     style A fill:#1f6feb,color:#fff
     style B fill:#8957e5,color:#fff
     style C fill:#1a7f37,color:#fff
@@ -137,6 +141,14 @@ flowchart TD
     style B2 fill:#da3633,color:#fff
     style V fill:#da3633,color:#fff
 ```
+
+### Before any path: read the room
+
+> **Consistency with the codebase beats textbook purity.**
+
+Every path starts with two cheap lookups. First, detect the stack from the manifest (`composer.json`, `package.json`, `go.mod`, `Cargo.toml`, `pyproject.toml`, `Gemfile`, `*.csproj`, `pom.xml`), never from file extensions, and open that stack's idioms file. Second, find how *this* codebase already solves this kind of problem (an existing `Actions/`, pipeline, event, job or resolver) and follow it. A second way of doing the same thing is a smell you are introducing. If the existing convention is itself a smell, the decision says so rather than quietly diverging.
+
+Reviewers re-triage on their own: a PR labelled "just structure" gets triaged by what the diff *does*, not what its description says.
 
 ### The core rule of Path A
 
@@ -148,11 +160,19 @@ Start from the problem. Every design pattern answers exactly one question:
 
 That is the *axis of change*. Name it in plain words before naming any pattern. If you cannot name one, there is no pattern to apply — and the correct design is direct, readable, deletable code.
 
+"No pattern needed" is still a decision, and it gets written down. The **NO-PATTERN** output names what would vary, why it does not vary today, and the trigger that would change the answer. A catalogue "use when" is not a "use now": Strategy lists export formats as a classic fit, and that still does not justify an exporter interface for a ticket with one format.
+
+When someone asks to "make it extensible", the gate stays and the answer changes. You deliver the **seam** instead of the abstraction: split what is stable from what would vary as two plain pieces, name the trigger ("when the second format has a ticket, this becomes a Strategy"), and explain why waiting is safer. An interface designed from one case is exactly the interface the second case cannot satisfy.
+
 ### The core rule of Path B
 
 > **Refactoring changes structure, never behaviour.**
 
 If behaviour changes it is a rewrite, and it needs its own tests, its own review, and its own commit. Tests come first, always. When they do not exist, characterization tests come first — pinning what the code does *today*, bugs included.
+
+Existing tests get **run**, and the result is shown: "the suite is probably green" is not a result. If no runner is installed, a plain script that runs the pinned cases and exits non-zero on drift counts as the safety net. A bug found mid-refactor stays pinned; it is fixed afterwards in its own commit, and the pinned expectation moves in that same commit.
+
+Deadline pressure does not create a third option. If pinning the behaviour costs less than the refactoring, pin it and refactor. If it costs more than the deadline allows, **do not refactor**: ship the change with Sprout or Wrap Method and schedule the cleanup. Adding a feature to messy code is *preparatory refactoring*: make the change easy in its own commits, then make the easy change in another.
 
 ### The core rule of Path C
 
@@ -173,7 +193,7 @@ The gate is scaled so it does not become bureaucracy:
 | Level | Trigger | Output |
 |---|---|---|
 | 🟢 **TRIVIAL** | One-line fix, config value, copy change | **Nothing.** The skill steps aside |
-| 🟡 **STANDARD** | New service, endpoint, component, small refactor | 2–4 lines: force → choice → rejected alternative |
+| 🟡 **STANDARD** | New service, endpoint, component, small refactor | 2–4 lines: force → choice → rejected alternative — or NO-PATTERN with its trigger |
 | 🔴 **ARCHITECTURAL** | New module, package, cross-cutting refactor | A `Pattern Decisions` section with a diagram and rejected alternatives |
 
 ---
@@ -337,14 +357,17 @@ Before designing or writing any non-trivial code, before any refactor, and
 when reviewing a design or a pull request, invoke the `patterns-and-refactoring`
 skill.
 
-- TRIVIAL work (one-line fixes, config, copy) is explicitly exempt — do not
-  invoke the skill and do not narrate a decision for it.
-- For everything else, state the force (or the smell), the choice made, and
-  the alternative rejected, before writing code. "No pattern needed" is a
-  decision and gets stated too.
+- TRIVIAL work (one-line fixes, config values, copy changes, bug fixes that
+  introduce no abstraction) is explicitly exempt. Do not invoke the skill and
+  do not narrate a decision for it.
+- For everything else, state the force (or the smell), the choice made, and the
+  alternative rejected — before writing code, not after. "No pattern needed"
+  is a decision and gets stated too.
 - Never refactor code that has no test coverage without first writing
-  characterization tests.
-- After implementing, run the skill's verification audit (Step 6) and report it.
+  characterization tests that pin current behaviour.
+- Never refactor and change behaviour in the same commit.
+- After implementing, run the skill's verification audit (Step 6) and report
+  it, including when it finds nothing to change.
 ```
 
 > [!TIP]
@@ -385,6 +408,22 @@ Once installed, it works without being asked for. Some examples of what changes:
 > **Blocker:** no test coverage. Writing characterization tests against the current behaviour first — pinning what it does today, bugs included.
 > **Then, smallest first:** Extract Method on `process()` → Replace Nested Conditional with Guard Clauses → Extract Class for the pricing responsibility. Commit at every green point.
 > **Pattern deferred:** the status branching wants Replace Type Code with State/Strategy, but that goes through the YAGNI gate after the mechanical refactorings land.
+
+</details>
+
+<details>
+<summary><b>Before / after — "make it extensible" (NO-PATTERN)</b></summary>
+
+**Prompt:** *"Add a CSV export of orders to the admin panel. Make it extensible — we might want Excel at some point."*
+
+**Without the skill:**
+> Creates an `ExporterInterface`, a `CsvExporter`, an `ExporterFactory` keyed by format, and a `config/exports.php` with one entry. The factory has one branch.
+
+**With the skill:**
+> **Force:** none today. One format, one consumer. "Excel at some point" has no ticket.
+> **Choice:** direct code. The orders query and the row formatting (`rowFor(Order)`) are two plain methods of the controller action. That split is the seam.
+> **Becomes a pattern when:** a second format has a ticket → Strategy over the writer, designed from both real formats.
+> **Extensibility, answered:** the seam already sits where the interface would go. An interface shaped around CSV today is the one Excel would not fit.
 
 </details>
 
@@ -563,6 +602,50 @@ The result: one repo, one clone, one source of truth. `install.sh`, the manual c
 
 ---
 
+## Changelog
+
+### 1.1.1 — 2026-09-14
+
+Documentation only; the skill itself is unchanged.
+
+- README brought in line with 1.1.0: Step 0.5, NO-PATTERN and the "make it extensible" answer, the Path B test and deadline rules, a NO-PATTERN before/after example, and this changelog.
+- The `CLAUDE.md` snippet shown in the README now matches [`CLAUDE.md.snippet.md`](CLAUDE.md.snippet.md).
+
+### 1.1.0 — 2026-09-10
+
+The gate used to run only before the code. Clean-context runs on three fixture scenarios exposed the two most expensive gaps. First, a correct "no pattern needed" decision was implemented as seven files anyway. Second, reviews were improvised differently on every run.
+
+**New**
+
+- **Path C — review.** Behaviour first, the YAGNI gate run backwards on each added abstraction, then the direct alternative sized in files, then nits.
+- **Step 6 — verification.** A post-implementation audit on every path, with counts: interfaces versus implementations, consumers per generic component, files per triage level, the rejected alternative left out, and tests that exercise the axis of change.
+- **Step 0.5 — read the room.** Detect the stack from the manifest, then follow how the codebase already solves the problem.
+- **NO-PATTERN** as an explicit, written output, plus the "make it extensible" answer: deliver the seam and name the trigger.
+- New references: [`decision-templates.md`](skills/patterns-and-refactoring/references/decision-templates.md), [`verification.md`](skills/patterns-and-refactoring/references/verification.md), [`testing-patterns.md`](skills/patterns-and-refactoring/references/testing-patterns.md).
+
+**Extended**
+
+- Path B: deadline pressure versus tests, settled as one rule plus a table of rationalizations. Tests must actually run, and a plain script counts when no runner exists. Bugs found mid-refactor are pinned, then fixed in their own commit.
+- `refactoring-workflow.md`: preparatory refactoring, Parallel Change (including schema expand/contract), Branch by Abstraction, and checkpoint granularity.
+- `refactoring-techniques.md`: Extract Method traps (return-type coercion, tighter parameter types).
+- `antipatterns.md`: misapplied principles, the utility dumping ground, the boolean parameter trap, soft-coding.
+- `idioms/laravel-php.md`: `Notification::via()` as the channel Strategy, Livewire and Inertia specifics, `lazyById` ordering and cursor buffering, `match` and its `===` semantics.
+- The skill `description` and the [`CLAUDE.md` snippet](CLAUDE.md.snippet.md) now also trigger on reviews and require the Step 6 audit.
+
+**Fixed**
+
+- A stale link in `enterprise-patterns.md` left over from the move from 2 stacks to 10.
+
+> [!NOTE]
+> Plugin users: run `claude plugin marketplace update christianpasinrey` and then `claude plugin update refactoring-guru`. Manual installs: pull and re-run the installer, or copy the directory again.
+
+### 1.0.0 — 2026-08-12
+
+- First plugin release: the repo root is both the plugin and a self-hosted marketplace.
+- Paths A and B, the three-level triage, 8 catalogues, and framework idioms for 10 stacks.
+
+---
+
 ## Contributing
 
 Contributions welcome, with one editorial constraint:
@@ -574,7 +657,7 @@ An entry describing only intent and structure will be asked for revision. That i
 Useful contributions:
 
 - [x] ~~Framework idioms for the major server and frontend stacks~~ — 10 stacks covered
-- [ ] Framework idioms for stacks not yet covered (Elixir/Phoenix, Swift, Flutter, Angular, Laravel Livewire specifics)
+- [ ] Framework idioms for stacks not yet covered (Elixir/Phoenix, Swift, Flutter, Angular)
 - [ ] Additional anti-patterns with concrete symptoms and cures
 - [ ] More worked examples in `decision-templates.md`, especially ARCHITECTURAL ones from non-PHP stacks
 - [ ] Shapes the verification audit misses — open an issue with the diff it let through
@@ -587,8 +670,9 @@ Open an issue before a large addition so the scope can be agreed first.
 Plugin users only receive changes when the version is bumped. For a release:
 
 1. Bump `version` in **both** `.claude-plugin/plugin.json` and the plugin entry in `.claude-plugin/marketplace.json` — they must agree.
-2. Validate: `claude plugin validate . --strict`
-3. Tag and push: `claude plugin tag .` creates `refactoring-guru--v<version>` after re-checking that both manifests match.
+2. Add an entry to the [Changelog](#changelog) and update the version badge at the top of this README.
+3. Validate: `claude plugin validate . --strict`
+4. Tag and push: `claude plugin tag .` creates `refactoring-guru--v<version>` after re-checking that both manifests match.
 
 ---
 
