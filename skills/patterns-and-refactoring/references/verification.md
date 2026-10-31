@@ -50,6 +50,11 @@ Shapes and doubles in detail: [testing-patterns.md](testing-patterns.md).
 A test that needed three mocks to reach the code under test is reporting a design problem.
 Do not fix the test; look at the boundary.
 
+**Two proofs every run owes, whatever was built:**
+
+- **Coverage of the request.** List each item asked for and the test or check that proves it. Work from the request, not from the diff: a dropped item leaves no trace in the code.
+- **Tests seen failing.** Run them before the code exists, or revert or break the change and watch them go red. A mock that returns the wrong shape can make a test pass against broken code. When comparing a run against a baseline, compare the list of failing test names, not the count: two failures can swap places.
+
 ---
 
 ## The simplification pass
@@ -62,7 +67,7 @@ Once, after the audit, with the diff open:
 4. **Rename** anything whose name is a mechanism (`Manager`, `Handler`, `Processor`, `Helper`, `Impl`) to what it does in the domain — or accept that the vagueness is the finding.
 5. **Read it as the reviewer** who has not seen the decision. Does the code say why it is shaped this way? If the decision is needed to understand the shape, either the shape is wrong or a one-line comment naming the force belongs at the seam.
 
-Then report — three lines, template in
+Then report — five lines, template in
 [decision-templates.md](decision-templates.md#verification-report-step-6-every-path).
 
 ---
@@ -101,6 +106,6 @@ The audit ran, something failed, and the code is already written. The temptation
 ## Sources
 
 Martin Fowler on [YAGNI](https://martinfowler.com/bliki/Yagni.html) and
-[Speculative Generality]; Sandi Metz, *Practical Object-Oriented Design* (the "wrong
+[Speculative Generality](code-smells.md#speculative-generality); Sandi Metz, *Practical Object-Oriented Design* (the "wrong
 abstraction" argument); John Ousterhout, *A Philosophy of Software Design* (deep vs shallow
 modules). Original commentary.

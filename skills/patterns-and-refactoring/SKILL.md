@@ -43,8 +43,9 @@ Two lookups before any decision, both cheap:
 
 1. **Detect the stack** from the manifest — `composer.json`, `package.json`, `go.mod`,
    `Cargo.toml`, `pyproject.toml`, `Gemfile`, `*.csproj`, `pom.xml` / `build.gradle` — and
-   open the matching file in [`references/idioms/`](references/idioms/). Do not guess the
-   stack from file extensions.
+   open the matching file in [`references/idioms/`](references/idioms/), at every level above
+   TRIVIAL and however long the session has run. The decision's **Framework** line names the
+   file you opened. Do not guess the stack from file extensions.
 2. **Find how this codebase already solves this kind of problem.** Grep for an existing
    `Actions/`, `Services/`, `Pipelines/`, event, job, or resolver that does something of the
    same shape. Follow it. Consistency with the codebase beats textbook purity: a second way of
@@ -207,7 +208,7 @@ Templates for every level, with worked examples, are in
 > **Pattern:** Strategy, resolved through the container by channel key.
 > **Rejected:** a `match` in the sender — three channels exist today and a fourth is on the
 > roadmap, so the branch would keep growing at one call site.
-> **Framework:** Laravel's notification channels already do this — extending `via()`, not a resolver.
+> **Framework:** `idioms/laravel-php.md` read: notification channels already do this — extending `via()`, not a resolver.
 
 **ARCHITECTURAL**: a `Pattern Decisions` section in the spec or plan, one entry per decision in
 the ADR shape from `decision-templates.md`, with a Mermaid diagram of the structure.
@@ -362,11 +363,13 @@ abstractions creep in unannounced. Full checklist in
 - [ ] **No generic component with one consumer** — a "reusable" writer, mapper or helper used from one place is inlined until the second consumer exists.
 - [ ] **Every new class is named for a domain concept**, not a mechanism (`PricingRule`, not `PricingStrategyFactoryImpl`).
 - [ ] **The rejected alternative did not sneak back in** — no `match` beside the Strategy, no wrapper beside the framework feature the decision chose.
+- [ ] **Every item requested maps to its proof** — a test or check per item, listed one by one. An item without proof is reported as not done.
 - [ ] **Tests exercise the axis of change** — one test per variant, wrapping order, listener plus wiring, or the pinned cases still green — and **they ran**. No runner installed → say so and show the lint or type check; never report tests as passing without a run.
+- [ ] **New tests were seen failing** — run before the code existed, or with the change reverted or deliberately broken. A test that has only ever been green proves nothing yet.
 - [ ] **File count matches the level** — a STANDARD decision that produced eight files is over-engineering or an undeclared ARCHITECTURAL one.
 - [ ] **The direct version, re-sketched now, is still worse.** If not, simplify before reporting done.
 
-Report the audit in the three-line shape from `decision-templates.md`, including "nothing to
+Report the audit in the five-line shape from `decision-templates.md`, including "nothing to
 change". An audit that only ever says "all good" is not being run.
 
 ---

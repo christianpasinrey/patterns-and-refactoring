@@ -53,7 +53,7 @@ Two to four lines, in the chat, before any code.
 **Force:** <what varies> per <who forces it>, chosen at <when>; <what must stay still>.
 **Pattern:** <name>, <how it is wired in this codebase or framework>.
 **Rejected:** <the direct or simpler alternative>, because <the concrete cost it would have here>.
-**Framework:** <what the stack already provides for this, and whether you are using it>.
+**Framework:** <the `idioms/` file you opened, what the stack already provides for this, and whether you are using it>.
 ```
 
 **Worked example** — "Notify users by SMS as well as email, per their preference."
@@ -255,26 +255,33 @@ architecture, just structure, quick approve".
 
 ## Verification report (Step 6, every path)
 
-After implementing — or, in Path C, for the alternative you proposed — three lines, even when
-the answer is "nothing to change".
+After implementing — or, in Path C, for the alternative you proposed — these five lines, even
+when the answer is "nothing to change".
 
 **Path C variant:** the audit runs on your sketch, so the counts are what the alternative
-*would* have, "Tests on the axis" names what the author still owes, and "Simplified" records
-what your sketch removed from theirs.
+*would* have, "Requested" lists what the PR claims to do, "Tests on the axis" and "Seen failing"
+name what the author still owes, and "Simplified" records what your sketch removed from theirs.
 
 ```
+**Requested:** <each item asked for → the test or check that proves it; "not done: <item>" is
+a valid line, an item left off the list is not>.
 **Audit:** <interfaces added / implementations>, <new files>, <generic components with one
 consumer>, <rejected alternative present? yes/no>.
 **Tests on the axis:** <which tests exercise the variation or the pinned behaviour, and
 whether they ran — "not run: no runner installed" is a valid line, "passing" without a run
 is not>.
+**Seen failing:** <how the new tests were shown to fail: run before the code existed, or with
+the change reverted or deliberately broken. "not shown" is a valid line>.
 **Simplified:** <what was inlined or deleted after the audit, or "nothing — direct version
 re-sketched, still worse">.
 ```
 
+> **Requested:** reject tampered bodies → `test_tampered_body`; reject replays →
+> `test_stale_timestamp`; keep valid events flowing → `test_valid_signature`.
 > **Audit:** 0 interfaces; 2 files (middleware, test); the HMAC helper has one caller and is
 > the declared seam.
 > **Tests on the axis:** feature test for a valid signature, a tampered body, and a stale
 > timestamp; run green.
+> **Seen failing:** with the signature check removed, the tampered and stale tests went red.
 > **Simplified:** removed a `config/webhooks.php` with one entry — the secret lives in the
 > existing `services.stripe` config.
