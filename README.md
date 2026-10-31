@@ -4,12 +4,12 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-skill-8A63D2)](https://docs.claude.com/en/docs/claude-code)
-[![Plugin](https://img.shields.io/badge/plugin-refactoring--guru%40christianpasinrey-8A63D2)](#recommended--plugin-from-the-marketplace)
-[![Version](https://img.shields.io/badge/version-1.1.1-8A63D2)](#changelog)
+[![Plugin](https://img.shields.io/badge/plugin-patterns--and--refactoring%40christianpasinrey-8A63D2)](#recommended--plugin-from-the-marketplace)
+[![Version](https://img.shields.io/badge/version-1.2.0-8A63D2)](#changelog)
 [![Standalone](https://img.shields.io/badge/dependencies-none-brightgreen)](#installation)
-[![Catalogues](https://img.shields.io/badge/catalogues-8-blue)](#whats-inside)
-[![References](https://img.shields.io/badge/reference%20files-26-blue)](#repository-layout)
-[![Stacks](https://img.shields.io/badge/framework%20idioms-10%20stacks-blue)](#whats-inside)
+[![Catalogues](https://img.shields.io/badge/catalogues-12-blue)](#whats-inside)
+[![References](https://img.shields.io/badge/reference%20files-42-blue)](#repository-layout)
+[![Stacks](https://img.shields.io/badge/framework%20idioms-22%20stacks-blue)](#whats-inside)
 
 > [!NOTE]
 > This skill is **standalone**. It needs no MCP server, no other skill, and no runtime. It is Markdown that changes how the model reasons about design. It ships two ways: as a **plugin** from this repo's marketplace (recommended — versioned, updatable) or as a **plain skill directory** copied into `~/.claude/skills`.
@@ -53,7 +53,7 @@ None of this is a knowledge gap. The catalogue is well documented and well repre
 This skill inserts that decision, and makes it cheap enough to actually happen.
 
 > [!IMPORTANT]
-> The skill's most-used output is **"no pattern needed — write the direct code."** It is a brake as much as a catalogue. A tool that only ever suggests adding abstraction is not helping.
+> **"No pattern needed — write the direct code"** is a first-class output of this skill. It is a brake as much as a catalogue. A tool that only ever suggests adding abstraction is not helping.
 
 ---
 
@@ -212,6 +212,10 @@ Eight catalogues, cross-referenced, with original commentary focused on **cost**
 | Messaging / integration (EIP) | 65 | [`distributed-patterns.md`](skills/patterns-and-refactoring/references/distributed-patterns.md#messaging-and-integration) |
 | Architectural patterns | Layering, topologies, multi-tenancy | [`architectural.md`](skills/patterns-and-refactoring/references/architectural.md) |
 | Domain-Driven Design | Strategic + tactical | [`ddd-patterns.md`](skills/patterns-and-refactoring/references/ddd-patterns.md) |
+| Application security | Trust boundaries, access models, tenant isolation, secrets | [`security-patterns.md`](skills/patterns-and-refactoring/references/security-patterns.md) |
+| Data evolution | Online schema change, backfills, stored formats | [`data-evolution.md`](skills/patterns-and-refactoring/references/data-evolution.md) |
+| Delivery | Deploy order, workers, flags, rollout, rollback | [`delivery-patterns.md`](skills/patterns-and-refactoring/references/delivery-patterns.md) |
+| API design | Resources, versioning, idempotency, contracts | [`api-design.md`](skills/patterns-and-refactoring/references/api-design.md) |
 
 Plus seven files that exist to keep the rest honest:
 
@@ -222,7 +226,7 @@ Plus seven files that exist to keep the rest honest:
 | [`testing-patterns.md`](skills/patterns-and-refactoring/references/testing-patterns.md) | Which tests each pattern owes, test doubles and when a mock is a design smell, characterization and approval nets, test smells, the honest pyramid |
 | [`refactoring-workflow.md`](skills/patterns-and-refactoring/references/refactoring-workflow.md) | Seams, characterization tests, preparatory refactoring, Parallel Change (expand/contract, including schemas), Branch by Abstraction, the Mikado Method, legacy modernization sequencing, and when *not* to refactor |
 | [`antipatterns.md`](skills/patterns-and-refactoring/references/antipatterns.md) | Pattern anti-patterns, structural anti-patterns, the ten principles most often cited to justify one, and the pre-flight checklist |
-| [`framework-idioms.md`](skills/patterns-and-refactoring/references/framework-idioms.md) | Router + cross-stack table, into **10 per-stack files** covering what your framework already implements — read before hand-rolling anything |
+| [`framework-idioms.md`](skills/patterns-and-refactoring/references/framework-idioms.md) | Router + cross-stack table, into **22 per-stack files** covering what your framework already implements — read before hand-rolling anything |
 | [`concurrency-patterns.md`](skills/patterns-and-refactoring/references/concurrency-patterns.md) · [`functional-patterns.md`](skills/patterns-and-refactoring/references/functional-patterns.md) · [`frontend-patterns.md`](skills/patterns-and-refactoring/references/frontend-patterns.md) | Domain-specific catalogues |
 
 <details>
@@ -243,7 +247,7 @@ Every entry carries **Cost** and **Do NOT use when**. That is the point of the c
 <details>
 <summary><b>Context cost — how this stays cheap</b></summary>
 
-`SKILL.md` is the routing layer and the only file loaded when the skill triggers (about 26 KB, roughly 6,500 tokens). The 16 reference files and 10 stack files are loaded **on demand**, one at a time, once the relevant family is already narrowed.
+`SKILL.md` is the routing layer and the only file loaded when the skill triggers (about 28 KB, roughly 7,000 tokens). The 20 reference files and 22 stack files are loaded **on demand**, one at a time, once the relevant family is already narrowed.
 
 A typical STANDARD-level decision loads `SKILL.md`, the stack's idioms file, and at most one catalogue. An ARCHITECTURAL decision may load two or three. The full corpus is never loaded at once, and never sits in your context between tasks.
 
@@ -263,15 +267,15 @@ Two routes. **The plugin is the recommended one** — it is versioned, updates w
 Inside Claude Code:
 
 ```
-/plugin marketplace add christianpasinrey/refactoring.guru-skill
-/plugin install refactoring-guru@christianpasinrey
+/plugin marketplace add christianpasinrey/patterns-and-refactoring
+/plugin install patterns-and-refactoring@christianpasinrey
 ```
 
 Or from a terminal:
 
 ```bash
-claude plugin marketplace add christianpasinrey/refactoring.guru-skill
-claude plugin install refactoring-guru@christianpasinrey
+claude plugin marketplace add christianpasinrey/patterns-and-refactoring
+claude plugin install patterns-and-refactoring@christianpasinrey
 ```
 
 The plugin installs the skill at **user scope** (every project). Use `--scope project` to commit it to a repo's `.claude/settings.json` so the whole team gets it, or `--scope local` for a machine-local, uncommitted install.
@@ -279,16 +283,16 @@ The plugin installs the skill at **user scope** (every project). Use `--scope pr
 Verify with `/plugin` or:
 
 ```bash
-claude plugin details refactoring-guru
+claude plugin details patterns-and-refactoring
 ```
 
-The skill shows up as `patterns-and-refactoring` and can be invoked explicitly as `/refactoring-guru:patterns-and-refactoring`.
+The skill shows up as `patterns-and-refactoring` and can be invoked explicitly as `/patterns-and-refactoring:patterns-and-refactoring`.
 
 **Updating:**
 
 ```bash
 claude plugin marketplace update christianpasinrey
-claude plugin update refactoring-guru
+claude plugin update patterns-and-refactoring
 ```
 
 Updates land only when the `version` field is bumped in the release — a pinned version means no surprise changes mid-session.
@@ -296,23 +300,23 @@ Updates land only when the `version` field is bumped in the release — a pinned
 **Uninstalling:**
 
 ```bash
-claude plugin uninstall refactoring-guru
+claude plugin uninstall patterns-and-refactoring
 claude plugin marketplace remove christianpasinrey
 ```
 
 ### Global — Linux / macOS / Git Bash
 
 ```bash
-git clone https://github.com/christianpasinrey/refactoring.guru-skill.git
-cd refactoring.guru-skill
+git clone https://github.com/christianpasinrey/patterns-and-refactoring.git
+cd patterns-and-refactoring
 ./install.sh
 ```
 
 ### Global — Windows PowerShell
 
 ```powershell
-git clone https://github.com/christianpasinrey/refactoring.guru-skill.git
-cd refactoring.guru-skill
+git clone https://github.com/christianpasinrey/patterns-and-refactoring.git
+cd patterns-and-refactoring
 .\install.ps1
 ```
 
@@ -472,12 +476,14 @@ Or point it at a decision directly: *"Use patterns-and-refactoring to decide how
 ## Repository layout
 
 ```
-refactoring.guru-skill/
+patterns-and-refactoring/
 ├── README.md
 ├── LICENSE
 ├── CLAUDE.md.snippet.md          # optional mandatory-invocation gate
 ├── install.sh                    # POSIX installer (plain-skill route)
 ├── install.ps1                   # Windows installer (plain-skill route)
+├── scripts/validate.py           # links, anchors, frontmatter, manifests
+├── evals/                        # behaviour scenarios and how to run them
 ├── .claude-plugin/
 │   ├── plugin.json               # plugin manifest — repo root *is* the plugin
 │   └── marketplace.json          # marketplace catalogue — repo root *is* the marketplace
@@ -496,22 +502,25 @@ refactoring.guru-skill/
             ├── concurrency-patterns.md
             ├── functional-patterns.md
             ├── frontend-patterns.md
+            ├── security-patterns.md
+            ├── data-evolution.md
+            ├── delivery-patterns.md
+            ├── api-design.md
             ├── code-smells.md
             ├── refactoring-techniques.md
             ├── refactoring-workflow.md
             ├── antipatterns.md
             ├── framework-idioms.md      # router + cross-stack table
             └── idioms/
-                ├── laravel-php.md       # Laravel · Symfony · PHP
-                ├── django-python.md     # Django · FastAPI · Python
-                ├── rails-ruby.md        # Rails · Ruby
-                ├── spring-java.md       # Spring · Java · Kotlin
-                ├── dotnet-csharp.md     # ASP.NET Core · C#
-                ├── node-typescript.md   # NestJS · Express · Node
-                ├── vue-typescript.md    # Vue · Nuxt
-                ├── react-typescript.md  # React · Next.js
-                ├── go.md
-                └── rust.md
+                ├── laravel-php.md · symfony-php.md
+                ├── django-python.md · fastapi-python.md · flask-python.md
+                ├── spring-java.md · quarkus-micronaut-java.md · kotlin-ktor.md
+                ├── dotnet-csharp.md · efcore-dotnet.md · blazor-dotnet.md
+                ├── node-typescript.md · rails-ruby.md · go.md · rust.md
+                ├── vue-typescript.md · react-typescript.md
+                ├── angular-typescript.md · svelte-typescript.md
+                ├── flutter-dart.md · swift-ios.md
+                └── blender-python.md
 ```
 
 ---
@@ -596,13 +605,40 @@ Claude Code discovers a plugin's `skills/` directory automatically, so the exist
 
 The result: one repo, one clone, one source of truth. `install.sh`, the manual copy, and `/plugin install` all serve the same files.
 
-**Rejected:** a separate marketplace repository, or a `plugins/refactoring-guru/` subdirectory with a duplicated copy of the skill. Both add a sync obligation between two copies of the same Markdown, which is exactly the kind of drift the skill tells you to design away.
+**Rejected:** a separate marketplace repository, or a `plugins/patterns-and-refactoring/` subdirectory with a duplicated copy of the skill. Both add a sync obligation between two copies of the same Markdown, which is exactly the kind of drift the skill tells you to design away.
 
 </details>
 
 ---
 
 ## Changelog
+
+### 1.2.0 — 2026-10-31
+
+**Renamed.** Repository and plugin are now `patterns-and-refactoring`, the name the skill already had, so the project no longer reads as affiliated with refactoring.guru. GitHub redirects the old URL, but the plugin id changed:
+
+```bash
+claude plugin uninstall refactoring-guru
+claude plugin marketplace update christianpasinrey
+claude plugin install patterns-and-refactoring@christianpasinrey
+```
+
+**Changed**
+
+- Step 6 now requires two more lines: each requested item mapped to its proof, and how new tests were seen failing. On the `requirement-coverage` scenario 1.1.1 failed 2 of 2 runs and this version passed 2 of 2.
+- The decision's Framework line names the `idioms/` file that was opened.
+- The verification report is five lines instead of three.
+
+**Added**
+
+- Twelve per-stack files: Symfony, FastAPI, Flask, Quarkus and Micronaut, Kotlin and Ktor, EF Core, Blazor, Angular, Svelte, Flutter, Swift, and Blender.
+- Four catalogues: security, data evolution, delivery, and API design.
+- `evals/` with four scenarios, `scripts/validate.py`, and CI running the validator.
+
+**Fixed**
+
+- `dotnet-csharp.md` presented the EF Core in-memory provider as a way to test real query translation.
+- A broken link in `verification.md`.
 
 ### 1.1.1 — 2026-09-14
 
@@ -637,7 +673,7 @@ The gate used to run only before the code. Clean-context runs on three fixture s
 - A stale link in `enterprise-patterns.md` left over from the move from 2 stacks to 10.
 
 > [!NOTE]
-> Plugin users: run `claude plugin marketplace update christianpasinrey` and then `claude plugin update refactoring-guru`. Manual installs: pull and re-run the installer, or copy the directory again.
+> Plugin users: run `claude plugin marketplace update christianpasinrey` and then `claude plugin update patterns-and-refactoring`. Manual installs: pull and re-run the installer, or copy the directory again.
 
 ### 1.0.0 — 2026-08-12
 
@@ -656,8 +692,9 @@ An entry describing only intent and structure will be asked for revision. That i
 
 Useful contributions:
 
-- [x] ~~Framework idioms for the major server and frontend stacks~~ — 10 stacks covered
-- [ ] Framework idioms for stacks not yet covered (Elixir/Phoenix, Swift, Flutter, Angular)
+- [x] ~~Framework idioms for the major server, frontend and mobile stacks~~ — 22 stacks covered
+- [ ] Framework idioms for stacks not yet covered (Elixir/Phoenix, Unity, Godot, Android)
+- [ ] Eval scenarios that fail on the current skill: a failing scenario is the strongest kind of contribution
 - [ ] Additional anti-patterns with concrete symptoms and cures
 - [ ] More worked examples in `decision-templates.md`, especially ARCHITECTURAL ones from non-PHP stacks
 - [ ] Shapes the verification audit misses — open an issue with the diff it let through
@@ -671,15 +708,15 @@ Plugin users only receive changes when the version is bumped. For a release:
 
 1. Bump `version` in **both** `.claude-plugin/plugin.json` and the plugin entry in `.claude-plugin/marketplace.json` — they must agree.
 2. Add an entry to the [Changelog](#changelog) and update the version badge at the top of this README.
-3. Validate: `claude plugin validate . --strict`
-4. Tag and push: `claude plugin tag .` creates `refactoring-guru--v<version>` after re-checking that both manifests match.
+3. Validate: `python scripts/validate.py` and `claude plugin validate . --strict`. For behaviour changes, run the affected scenarios in [`evals/`](evals/README.md) against the previous version.
+4. Tag and push: `claude plugin tag .` creates `patterns-and-refactoring--v<version>` after re-checking that both manifests match.
 
 ---
 
 ## Attribution and sources
 
 > [!IMPORTANT]
-> This project is **not affiliated with, endorsed by, or connected to refactoring.guru** or Alexander Shvets. The repository name reflects that the pattern and refactoring taxonomies follow that site's well-known catalogue structure. All text in this skill is **original writing** — no content is reproduced from refactoring.guru or any other source.
+> This project is **not affiliated with, endorsed by, or connected to refactoring.guru** or Alexander Shvets. The pattern and refactoring taxonomies follow that site's well-known structure and are credited here. All text in this skill is **original writing** — no content is reproduced from refactoring.guru or any other source.
 
 For illustrated explanations, full code examples in PHP and 8 other languages, and the definitive presentation of the catalogue, go to the source: **<https://refactoring.guru>**.
 

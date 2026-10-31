@@ -7,11 +7,11 @@
   },
   "plugins": [
     {
-      "name": "refactoring-guru",
+      "name": "patterns-and-refactoring",
       "source": "./",
-      "displayName": "Refactoring Guru — Patterns & Refactoring",
-      "description": "Forces a deliberate design decision before non-trivial code is written, a test-backed process before code is restructured, a structured review of someone else's abstractions, and an audit of what was actually built. Ships the patterns-and-refactoring skill: 22 GoF patterns, 66 refactoring techniques, 22 code smells, enterprise/architectural/DDD/distributed/concurrency/functional/frontend catalogues, anti-patterns, testing patterns, decision templates and framework idioms for 10 stacks.",
-      "version": "1.1.1",
+      "displayName": "Patterns & Refactoring",
+      "description": "Forces a deliberate design decision before non-trivial code is written, a test-backed process before code is restructured, a structured review of someone else's abstractions, and an audit of what was actually built. Ships the patterns-and-refactoring skill: 22 GoF patterns, 66 refactoring techniques, 22 code smells, enterprise/architectural/DDD/distributed/concurrency/functional/frontend/security/data-evolution/delivery/API-design catalogues, anti-patterns, testing patterns, decision templates and framework idioms for 22 stacks.",
+      "version": "1.2.0",
       "category": "development",
       "tags": [
         "design-patterns",
@@ -27,8 +27,8 @@
         "name": "Christian Pasín Rey",
         "url": "https://github.com/christianpasinrey"
       },
-      "homepage": "https://github.com/christianpasinrey/refactoring.guru-skill#readme",
-      "repository": "https://github.com/christianpasinrey/refactoring.guru-skill",
+      "homepage": "https://github.com/christianpasinrey/patterns-and-refactoring#readme",
+      "repository": "https://github.com/christianpasinrey/patterns-and-refactoring",
       "license": "MIT"
     }
   ]
