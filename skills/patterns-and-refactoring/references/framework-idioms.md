@@ -12,16 +12,30 @@ that way. Reimplementing it is not.
 
 | Stack | File |
 |---|---|
-| **Laravel · Symfony · PHP** | [idioms/laravel-php.md](idioms/laravel-php.md) |
-| **Django · FastAPI · Python** | [idioms/django-python.md](idioms/django-python.md) |
+| **Laravel · PHP** | [idioms/laravel-php.md](idioms/laravel-php.md) |
+| **Symfony · Doctrine** | [idioms/symfony-php.md](idioms/symfony-php.md) |
+| **Django · Python** | [idioms/django-python.md](idioms/django-python.md) |
+| **FastAPI · Pydantic · SQLAlchemy** | [idioms/fastapi-python.md](idioms/fastapi-python.md) |
+| **Flask** | [idioms/flask-python.md](idioms/flask-python.md) |
 | **Rails · Ruby** | [idioms/rails-ruby.md](idioms/rails-ruby.md) |
-| **Spring · Java · Kotlin** | [idioms/spring-java.md](idioms/spring-java.md) |
+| **Spring · Java** | [idioms/spring-java.md](idioms/spring-java.md) |
+| **Quarkus · Micronaut** | [idioms/quarkus-micronaut-java.md](idioms/quarkus-micronaut-java.md) |
+| **Kotlin · Ktor** | [idioms/kotlin-ktor.md](idioms/kotlin-ktor.md) |
 | **ASP.NET Core · C#** | [idioms/dotnet-csharp.md](idioms/dotnet-csharp.md) |
+| **Entity Framework Core** | [idioms/efcore-dotnet.md](idioms/efcore-dotnet.md) |
+| **Blazor** | [idioms/blazor-dotnet.md](idioms/blazor-dotnet.md) |
 | **NestJS · Express · Node/TypeScript** | [idioms/node-typescript.md](idioms/node-typescript.md) |
 | **Vue · Nuxt · TypeScript** | [idioms/vue-typescript.md](idioms/vue-typescript.md) |
 | **React · Next.js · TypeScript** | [idioms/react-typescript.md](idioms/react-typescript.md) |
+| **Angular** | [idioms/angular-typescript.md](idioms/angular-typescript.md) |
+| **Svelte · SvelteKit** | [idioms/svelte-typescript.md](idioms/svelte-typescript.md) |
+| **Flutter · Dart** | [idioms/flutter-dart.md](idioms/flutter-dart.md) |
+| **Swift · SwiftUI** | [idioms/swift-ios.md](idioms/swift-ios.md) |
 | **Go** | [idioms/go.md](idioms/go.md) |
 | **Rust** | [idioms/rust.md](idioms/rust.md) |
+| **Blender · bpy · procedural assets** | [idioms/blender-python.md](idioms/blender-python.md) |
+
+A stack can need two files: Symfony with Laravel's language section, or ASP.NET Core with EF Core.
 
 Plain PHP, Python, Ruby or TypeScript with no framework? Open the same-language file and use
 its "language features that replace patterns" section; skip the framework tables.

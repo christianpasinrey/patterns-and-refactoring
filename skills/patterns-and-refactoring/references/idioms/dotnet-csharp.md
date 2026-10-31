@@ -44,7 +44,7 @@ repository.
 
 **Not justified when:**
 
-- "For testability." EF Core's in-memory provider or SQLite in-memory tests the real query translation. A mocked `IRepository<T>` tests that your mocks agree with themselves.
+- "For testability" while a real database can run in the tests. Tests against the production engine exercise the real query translation; a mocked `IRepository<T>` tests that your mocks agree with themselves. EF Core's in-memory provider is not that shortcut: its documentation discourages it. Details in [efcore-dotnet.md](efcore-dotnet.md).
 - "To swap the ORM." You will not.
 - "Best practice." It is a widely-copied template, not a reasoned decision.
 

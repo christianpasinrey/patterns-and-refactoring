@@ -1,6 +1,6 @@
 ---
 name: patterns-and-refactoring
-description: Use before designing or writing any non-trivial code, before any refactor, and when reviewing a design or pull request for structure. Triggers on designing a class, service, module or package; choosing an approach; "how should I structure this"; refactoring, cleaning up, "this code is messy"; legacy migration; adding a feature to tangled code; and reviewing someone else's abstractions. Covers GoF, refactoring techniques, code smells, PoEAA, architectural, DDD, distributed, messaging, concurrency, functional and frontend patterns, anti-patterns, testing shapes, and per-stack framework idioms.
+description: Use before designing or writing any non-trivial code, before any refactor, and when reviewing a design or pull request for structure. Triggers on designing a class, service, module or package; choosing an approach; "how should I structure this"; refactoring, cleaning up, "this code is messy"; legacy migration; adding a feature to tangled code; and reviewing someone else's abstractions. Covers GoF, refactoring techniques, code smells, PoEAA, architectural, DDD, distributed, messaging, concurrency, functional, frontend, security, data evolution, delivery and API design, anti-patterns, testing shapes, and per-stack framework idioms.
 ---
 
 # Patterns & Refactoring
@@ -42,7 +42,8 @@ behaviour. Triage what the diff *does*, not what its description says.
 Two lookups before any decision, both cheap:
 
 1. **Detect the stack** from the manifest — `composer.json`, `package.json`, `go.mod`,
-   `Cargo.toml`, `pyproject.toml`, `Gemfile`, `*.csproj`, `pom.xml` / `build.gradle` — and
+   `Cargo.toml`, `pyproject.toml`, `Gemfile`, `*.csproj`, `pom.xml` / `build.gradle`,
+   `pubspec.yaml`, `Package.swift` — and
    open the matching file in [`references/idioms/`](references/idioms/), at every level above
    TRIVIAL and however long the session has run. The decision's **Framework** line names the
    file you opened. Do not guess the stack from file extensions.
@@ -98,6 +99,10 @@ readable, deletable code. Go to Step 5 and write the NO-PATTERN decision.
 | How work runs in parallel or asynchronously | Concurrency | [concurrency-patterns.md](references/concurrency-patterns.md) |
 | How data is transformed and errors are carried | Functional | [functional-patterns.md](references/functional-patterns.md) |
 | How UI components, state, and rendering are organised | Frontend | [frontend-patterns.md](references/frontend-patterns.md) |
+| Who may do what, and where trust ends | Security | [security-patterns.md](references/security-patterns.md) |
+| How stored data and schemas change while the system runs | Data evolution | [data-evolution.md](references/data-evolution.md) |
+| How a change reaches production safely | Delivery | [delivery-patterns.md](references/delivery-patterns.md) |
+| What a public interface promises to its callers | API design | [api-design.md](references/api-design.md) |
 
 ### Fast routing from a stated force
 
@@ -390,12 +395,16 @@ Load only what you need. `SKILL.md` routes; the references carry the depth.
 | [concurrency-patterns.md](references/concurrency-patterns.md) | Parallelism, async work, shared mutable state |
 | [functional-patterns.md](references/functional-patterns.md) | Data transformation, error handling without exceptions, composition |
 | [frontend-patterns.md](references/frontend-patterns.md) | Components, client state, rendering, data fetching |
+| [security-patterns.md](references/security-patterns.md) | Trust boundaries, authentication, authorization, tenant isolation, secrets |
+| [data-evolution.md](references/data-evolution.md) | Schema changes, backfills, stored format changes, indexes, test database fidelity |
+| [delivery-patterns.md](references/delivery-patterns.md) | Deploy order, long-lived workers, feature flags, rollout, rollback |
+| [api-design.md](references/api-design.md) | Resources, versioning, pagination, idempotency, error shapes, contracts |
 | [code-smells.md](references/code-smells.md) | Existing code hurts and you need to name why |
 | [refactoring-techniques.md](references/refactoring-techniques.md) | You know the smell and need the mechanical cure |
 | [refactoring-workflow.md](references/refactoring-workflow.md) | Refactoring safely: seams, characterization tests, expand/contract, Branch by Abstraction, legacy work |
 | [testing-patterns.md](references/testing-patterns.md) | Which tests a pattern or a refactor needs; doubles, contract tests, approval tests, test smells |
 | [antipatterns.md](references/antipatterns.md) | You are about to add indirection and want the gate applied honestly |
-| [framework-idioms.md](references/framework-idioms.md) | **Before hand-rolling any pattern.** Routes to one of 10 per-stack files in [`references/idioms/`](references/idioms/) |
+| [framework-idioms.md](references/framework-idioms.md) | **Before hand-rolling any pattern.** Routes to one of 22 per-stack files in [`references/idioms/`](references/idioms/) |
 
 ---
 
