@@ -1,0 +1,1 @@
+Security wants `oauth_tokens.access_token` encrypted at rest. Add the cast to the model and a migration that encrypts the existing rows. We deploy with `git pull && php artisan migrate`. Tell me when it is ready to ship.

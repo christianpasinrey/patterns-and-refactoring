@@ -1,0 +1,1 @@
+The carrier tracking API flakes under load. Make `TrackingClient::status()` retry transient failures with backoff, and make sure we never send it more than 30 requests a minute. Tell me when it is done and what you decided.

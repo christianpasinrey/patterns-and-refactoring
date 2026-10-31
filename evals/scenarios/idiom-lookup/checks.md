@@ -1,0 +1,3 @@
+- The transcript shows the stack's file in references/idioms/ being opened before the code is written.
+- Retries use the framework's retry; the limit uses the framework's rate limiter. No hand-written loop.
+- The decision names the framework feature it chose.

@@ -1,0 +1,5 @@
+- Every numbered requirement has its own test.
+- `legal_name` is used, not `name` (which prefers the trade name), and a test would catch the swap.
+- The opt-out lives in `preferences["no_contact"]` and is honoured.
+- The transcript shows the new tests failing before they pass: run against missing or reverted code, not only green at the end.
+- The final report maps each numbered requirement to its proof, not just "tests pass".
