@@ -102,6 +102,8 @@ if not len(obj.evaluated_get(depsgraph).data.polygons):
 - **Name the scene explicitly.** A context override does not change which scene is rendered:
   use `blender -b file -S scene`.
 - **Time one frame before committing to a sequence**, and test the encoder on a tiny one.
+- **Watch memory, and stop only your own jobs.** A failed allocation can leave a hung process
+  holding the RAM. Build expensive data outside Blender when a small script can compute it.
 
 ---
 
@@ -118,6 +120,17 @@ When the viewer cannot move, detail belongs where it lands on screen, not evenly
   its pixels. A shader that derives the surface point from the view direction stays sharp.
 
 ---
+
+## Natural surfaces
+
+- **Rock is planes, not noise.** Erosion alone gives rounded clay. Replacing each Voronoi cell with
+  the tangent plane at its seed, coarse to fine, gives real faces and sharp edges. Cap the plane
+  slope, or snow has nowhere to settle.
+- **Do not measure cliffs from above.** Noise sampled on x and y smears down steep walls. Sample
+  it along the wall, using height as one axis.
+- **Keep detail above the mesh's sampling limit.** Height detail finer than the spacing combs.
+  Put it in the material, where it is evaluated per pixel.
+- **Light from the side.** A sun behind the camera flattens any relief.
 
 ## Signs you are working against the tool
 

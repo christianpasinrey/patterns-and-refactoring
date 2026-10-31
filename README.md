@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-skill-8A63D2)](https://docs.claude.com/en/docs/claude-code)
 [![Plugin](https://img.shields.io/badge/plugin-patterns--and--refactoring%40christianpasinrey-8A63D2)](#recommended--plugin-from-the-marketplace)
-[![Version](https://img.shields.io/badge/version-1.2.0-8A63D2)](#changelog)
+[![Version](https://img.shields.io/badge/version-1.2.1-8A63D2)](#changelog)
 [![Standalone](https://img.shields.io/badge/dependencies-none-brightgreen)](#installation)
 [![Catalogues](https://img.shields.io/badge/catalogues-12-blue)](#whats-inside)
 [![References](https://img.shields.io/badge/reference%20files-42-blue)](#repository-layout)
@@ -615,6 +615,10 @@ The result: one repo, one clone, one source of truth. `install.sh`, the manual c
 ---
 
 ## Changelog
+
+### 1.2.1 — 2026-10-31
+
+- `idioms/blender-python.md`: lessons on natural terrain and long headless jobs, from a second round on the showcase scene.
 
 ### 1.2.0 — 2026-10-31
 
