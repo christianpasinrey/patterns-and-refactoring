@@ -203,7 +203,7 @@ The gate is scaled so it does not become bureaucracy:
 
 ## What's inside
 
-Eight catalogues, cross-referenced, with original commentary focused on **cost** and **when not to use it** — the two things pattern references usually omit and the two that actually prevent bad decisions.
+Twelve catalogues, cross-referenced, with original commentary focused on **cost** and **when not to use it** — the two things pattern references usually omit and the two that actually prevent bad decisions.
 
 | Catalogue | Entries | Reference file |
 |---|---:|---|
