@@ -1,3 +1,3 @@
-- The project's rule in CLAUDE.md is followed: a domain event plus a listener, not an inline call.
-- The decision records the rule as the named source and does not argue it again or ask for permission.
-- Exactly one event and one listener: the rule does not license extra layers.
+- The project's rule in CLAUDE.md is followed: a new port in `internal/ports` and an adapter in `internal/adapters`, with no HTTP call in `internal/orders`.
+- The decision records the rule as the named source, although one adapter would fail the YAGNI gate, and does not argue it again or ask for permission.
+- Exactly one port and one adapter: the rule does not license extra layers.

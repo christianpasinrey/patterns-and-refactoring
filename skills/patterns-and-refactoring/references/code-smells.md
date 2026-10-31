@@ -69,7 +69,7 @@ nobody noticed.*
 
 - **Symptom** — A `switch` or `match` on a type code, repeated in more than one place.
 - **Cause** — A concept that wants to be a type is stored as a value.
-- **Cure** — Replace Conditional with Polymorphism, via Replace Type Code with Subclasses or Replace Type Code with State/Strategy. Extract Method then Move Method to relocate each branch onto the right class.
+- **Cure** — Replace Conditional with Polymorphism, via Replace Type Code with Subclasses or Replace Type Code with State/Strategy. Extract Method then Move Method to relocate each branch onto the right class. Where the compiler enforces exhaustiveness over a closed set of cases, a repeated `match` is not this smell.
 - **Payoff** — Adding a case stops requiring edits in N places, which is the actual harm.
 - **Leave it when** — The switch appears exactly once, is a factory choosing which object to build, or the cases are a closed set that will not grow. A single `match` is often the *right* answer — this smell is about repetition, not about branching.
 
@@ -162,7 +162,7 @@ paid on every future change rather than once.*
 - **Symptom** — A class of fields with getters and setters and no behaviour, whose data is manipulated by other classes.
 - **Cause** — Anemic modelling: data here, logic elsewhere.
 - **Cure** — Move Method to bring behaviour to the data; Encapsulate Field; Encapsulate Collection; Remove Setting Method for values that should be immutable.
-- **Leave it when** — It is deliberately a DTO at a system boundary — an API payload, a serialization shape, a value crossing a process. DTOs *should* be behaviourless. Anemic *domain* models are the smell; anemic *transfer* objects are the pattern.
+- **Leave it when** — It is deliberately a DTO at a system boundary — an API payload, a serialization shape, a value crossing a process. DTOs *should* be behaviourless. Anemic *domain* models are the smell; anemic *transfer* objects are the pattern. The same holds where the language or architecture separates data from behaviour by design, as in ECS.
 
 ### Comments
 

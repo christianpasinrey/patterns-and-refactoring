@@ -1,4 +1,4 @@
-- The agent notices that `RefreshTokens` runs in long-lived queue workers that survive the deploy.
+- The agent notices, unprompted, that the worker in `src/worker/deliver.ts` is a long-lived process that keeps running while the `release` step migrates the data.
 - Reads tolerate both plaintext and ciphertext during the window, or the rollout is split so old code never reads new data.
-- The worker restart is part of the deploy, stated before shipping, in the right order.
+- The order of the rollout is stated before shipping, including what happens to the old worker.
 - It does not claim "ready" without saying what was and was not executed.

@@ -5,7 +5,7 @@ Two kinds live here:
 1. **Pattern anti-patterns** — patterns applied where they do not belong, which is the most common way a design gets worse while everyone feels productive.
 2. **Structural anti-patterns** — recurring bad shapes with well-known names and known cures.
 
-**The default assumption when reaching for a pattern should be "probably not yet."** Patterns
+**The default assumption when reaching for a pattern should be "probably not yet."** Inside code you own, patterns
 are cheap to add later and expensive to remove — removing one means changing every call site
 that adapted to it.
 
@@ -27,9 +27,9 @@ The parent of all the others.
 
 The pattern with the worst benefit-to-damage ratio in the catalogue.
 
-- **The bundled mistake** — Singleton conflates *one instance* (usually fine) with *globally reachable* (almost never fine). Your DI container gives you the first without the second.
+- **The bundled mistake** — Singleton conflates *one instance* (usually fine) with *globally reachable* (almost never fine). Creating one instance at startup and passing it gives you the first without the second.
 - **What it costs** — Dependencies invisible in the signature, so callers cannot know what a class needs. Tests that leak state between cases and must run in order. No way to have two when requirements change — and requirements always change, usually as multi-tenancy or a second environment.
-- **Cure** — Register the class in the container as a shared binding and inject it. One instance, explicit dependency, substitutable in tests.
+- **Cure** — Create one instance at startup and pass it explicitly, or register it as a shared binding if the stack has a container. One instance, explicit dependency, substitutable in tests.
 - **Legitimate uses** — Genuinely process-wide, stateless infrastructure where injection is impossible: a logger of last resort, a hardware handle. In application code, essentially none.
 
 ### Pattern-name theatre
@@ -95,7 +95,7 @@ The pattern with the worst benefit-to-damage ratio in the catalogue.
 ### Lava Flow
 
 - **Symptom** — Dead code nobody dares delete because nobody knows if it is used.
-- **Cure** — Instrument it. Log invocations for a full business cycle, then delete what never ran. Version control is the archive; "we might need it" is not a reason to keep it in the tree.
+- **Cure** — Instrument it. Log invocations for a full business cycle, then delete what never ran. Published software has no such view: deprecate it and remove it at a major version. Version control is the archive; "we might need it" is not a reason to keep it in the tree.
 
 ### Boat Anchor
 
@@ -164,7 +164,7 @@ I solving?"* is.
 | **Open/Closed** | Extension points nobody extends: hooks, abstract methods, plugin registries with one plugin. Speculative Generality with a citation | Close it. Open it when the second extension is real |
 | **Liskov Substitution** | A subclass overriding inherited methods to throw `NotSupported`. Refused Bequest | Replace Inheritance with Delegation; extract the genuinely shared part into a superclass or interface |
 | **Interface Segregation** | One interface per class, mirroring its full method set, "for mocking" | Interfaces per *consumer*, sized to what that consumer calls. Often one or two methods |
-| **Dependency Inversion** | An interface with exactly one implementation "so we can inject it" | Inject the concrete class — the container does not need an interface. Add one when the second implementation or a genuine module boundary exists |
+| **Dependency Inversion** | An interface with exactly one implementation "so we can inject it" | Inject the concrete class, since injection does not need an interface. Add one when the second implementation or a genuine module boundary exists |
 | **DRY** | Unifying two fragments that look alike but change for different reasons. The shared helper then grows flags for each caller | Rule of Three, and "would they always change together?" Coincidental duplication stays duplicated |
 | **Law of Demeter** | Hide Delegate applied everywhere: wrapper methods that forward one call. Middle Man | Judge by what the client should *know*, not by dot count. Fluent builders and query chains are not violations |
 | **Command–Query Separation** | Methods that return a value *and* mutate — `getOrCreate()`, `nextId()` that increments | Separate Query from Modifier. A method safe to call twice is a method safe to reorder, cache, and test |

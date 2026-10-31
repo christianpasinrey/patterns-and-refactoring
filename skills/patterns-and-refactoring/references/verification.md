@@ -19,7 +19,7 @@ Count, do not estimate. Open the diff and answer with numbers.
 | **Interfaces and abstract classes added** | Each has ≥ 2 implementations *in this change*, or is named in the decision as a deliberate seam with its trigger | Speculative Generality. Inline to the concrete class; keep the seam as a plain method boundary |
 | **Generic components** ("reusable" writer, mapper, base controller, helper) | ≥ 2 consumers in this change | A library with one user. Inline into the consumer; extract when the second appears |
 | **New files vs level** | STANDARD ≈ 1–4 files; ARCHITECTURAL declared as such | Either the triage was wrong (re-triage, write the Pattern Decisions section) or the design is inflated |
-| **Class names** | Every new class names a domain concept a product owner would recognise | Pattern-name theatre. Rename to the concept; if no concept fits, the class should not exist |
+| **Names** | Every new type or module names a concept from the problem it solves; for a library or tool, that is its users' vocabulary | Pattern-name theatre. Rename to the concept; if no concept fits, question whether it should exist |
 | **Rejected alternative** | Absent from the code | The `match` next to the Strategy, the wrapper beside the framework feature, the DTO for the internal call — remove one of the two |
 | **Framework feature chosen in the decision** | Actually used, not re-implemented beside it | Delete the hand-rolled version |
 | **Parameters** | No boolean flags added; no `$options = []` nobody passes | Replace Parameter with Explicit Methods; Remove Parameter |
@@ -40,7 +40,7 @@ not just the happy path.
 | **Observer / event / listener** | The listener in isolation, and an assertion that the event is dispatched from the right place |
 | **State / status transitions** | The transition table: each legal transition passes, illegal ones are rejected |
 | **Adapter / gateway / third-party client** | Contract tests against recorded responses; error and timeout paths |
-| **Command / job / handler** | Runs twice, one effect (idempotency); serialises and deserialises |
+| **Command / job / handler** | If queued or retried: runs twice, one effect, and survives serialisation. If in-process: execute then undo restores the prior state |
 | **Value object** | Invalid input rejected at construction; equality by value; immutability |
 | **Refactoring (Path B)** | The characterization or existing suite, green, run *after* the last step — paste the result |
 | **NO-PATTERN direct code** | The feature test; nothing else is owed |
@@ -64,10 +64,10 @@ Once, after the audit, with the diff open:
 1. **Inline** any method, class, or file with one caller that adds a name but not a concept.
 2. **Delete** any parameter, branch, or configuration that no caller exercises.
 3. **Collapse** any hierarchy with one leaf.
-4. **Rename** anything whose name is a mechanism (`Manager`, `Handler`, `Processor`, `Helper`, `Impl`) to what it does in the domain — or accept that the vagueness is the finding.
+4. **Rename** anything whose name is a mechanism (`Manager`, `Handler`, `Processor`, `Helper`, `Impl`) to what it does — or accept that the vagueness is the finding.
 5. **Read it as the reviewer** who has not seen the decision. Does the code say why it is shaped this way? If the decision is needed to understand the shape, either the shape is wrong or a one-line comment naming the force belongs at the seam.
 
-Then report — five lines, template in
+Then report — six lines, template in
 [decision-templates.md](decision-templates.md#verification-report-step-6-every-path).
 
 ---
@@ -79,7 +79,7 @@ frequency. Each is invisible from inside the task and obvious in review.
 
 | Shape | Looks like | Why it appears |
 |---|---|---|
-| **Interface with one implementation** | `FooInterface` + `Foo`, bound in the container | "For DI" or "for tests". Neither needs it: inject the concrete class; fake at the boundary |
+| **Interface with one implementation** | `FooInterface` + `Foo`, bound in the container | "For DI" or "for tests". Where the language can fake a concrete type, inject it and fake at the boundary. Where it cannot, the test double is the second implementation: declare the seam |
 | **Generic utility for one caller** | `CsvWriter`, `ArrayMapper`, `BaseService` used once | "It might be reused." Rule of Three applies to reuse too |
 | **DTO for an internal call** | `RecalculateTotalsInputDTO { int $orderId }`, built and consumed in the same class | DTOs cross process or module boundaries; inside a class they are a wrapped int |
 | **Wrapper around a stable dependency** | `MyHttpClient` over Guzzle, `CacheService` over the cache facade | "So we can swap it." The wrapper is shaped by the current library and will not fit the replacement |

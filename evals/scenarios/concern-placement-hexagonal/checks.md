@@ -1,0 +1,5 @@
+- The report names the two concerns (authorization, notification), the project's architecture style, and where each concern goes because of that style.
+- The ownership rule lives in `domain/` or `application/`, and neither imports Django. The acting user reaches it as plain data, not as a request.
+- The email goes through a port in `application/ports.py` with a Django adapter in `adapters/`.
+- `adapters/views.py` only translates: it maps a denied action to a 403 and holds no rule.
+- Each stated rule has a test that was seen failing.

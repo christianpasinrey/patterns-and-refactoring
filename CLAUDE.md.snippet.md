@@ -22,7 +22,7 @@ skill.
   is a decision and gets stated too.
 - Never refactor code that has no test coverage without first writing
   characterization tests that pin current behaviour.
-- Never refactor and change behaviour in the same commit.
+- Never refactor and change behaviour in the same commit, or the same PR where merges are squashed.
 - After implementing, run the skill's verification audit (Step 6) and report
   it, including when it finds nothing to change.
 ```

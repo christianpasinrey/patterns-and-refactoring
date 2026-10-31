@@ -1,1 +1,1 @@
-When a review is published, the roaster page cache must be cleared. Implement it.
+When an order ships, also tell the warehouse system with a `POST /shipments` to its HTTP API. Implement it.

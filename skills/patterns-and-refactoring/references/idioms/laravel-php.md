@@ -79,6 +79,16 @@ persistence abstraction that fights the framework.
 
 ---
 
+## Concurrency in PHP
+
+The classic PHP model has no threads, so the risk moves.
+
+- **Process-per-request** is the default. Almost no in-process concurrency, therefore almost no data races — a real safety advantage that is easy to forget you are relying on.
+- **The shared mutable state is the database and the cache.** Concurrency bugs move there: lost updates without optimistic locking, cache stampedes, double-processed jobs.
+- **Queue workers are the concurrency model.** Jobs must be idempotent because retries are automatic. Use unique-job locks for work that must not run twice concurrently.
+- **Atomic cache operations** (`add`, `increment`, lock helpers) are your mutex. `get`-then-`set` is a race.
+- **Long-running runtimes** (Swoole, RoadRunner, FrankenPHP, Octane) remove the process-per-request safety net: static properties, container singletons and thread-local-ish state now persist between requests and leak across users. Code that was safe under FPM may not be.
+
 ## Symfony specifics
 
 Symfony makes several different choices, and the idioms differ accordingly.

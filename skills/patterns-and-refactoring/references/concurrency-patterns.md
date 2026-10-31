@@ -144,15 +144,12 @@ Worth stating plainly because it is widely misunderstood.
 
 ---
 
-## Concurrency in PHP specifically
+## The runtime decides where the risk lives
 
-Worth calling out, since the classic PHP model has no threads.
-
-- **Process-per-request** is the default. Almost no in-process concurrency, therefore almost no data races — a real safety advantage that is easy to forget you are relying on.
-- **The shared mutable state is the database and the cache.** Concurrency bugs move there: lost updates without optimistic locking, cache stampedes, double-processed jobs.
-- **Queue workers are the concurrency model.** Jobs must be idempotent because retries are automatic. Use unique-job locks for work that must not run twice concurrently.
-- **Atomic cache operations** (`add`, `increment`, lock helpers) are your mutex. `get`-then-`set` is a race.
-- **Long-running runtimes** (Swoole, RoadRunner, FrankenPHP, Octane) remove the process-per-request safety net: static properties, container singletons and thread-local-ish state now persist between requests and leak across users. Code that was safe under FPM may not be.
+Threads, an event loop, one process per request and a game loop each move shared state somewhere
+else. Name which one you are in before choosing a primitive, then read the stack's file in
+[idioms/](idioms/): [PHP's process model](idioms/laravel-php.md#concurrency-in-php), for example,
+moves the races into the database and the cache.
 
 ---
 

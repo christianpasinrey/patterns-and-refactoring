@@ -16,7 +16,7 @@ patterns). Original commentary.
 
 ## Resilience — surviving other people's failures
 
-**The core four, always together.** Each is incomplete without the others.
+**The core four, together in long-lived services.** Each is incomplete without the others.
 
 ### Timeout
 
@@ -230,7 +230,7 @@ them, a failure spanning four services is not diagnosable at all.
 ## Choosing: the honest defaults
 
 1. **Do not distribute until you must.** Every pattern here is compensation for a boundary you chose to create. A modular monolith needs almost none of them.
-2. **Timeout + Retry-with-backoff-and-jitter + Circuit Breaker on every outbound call.** This is the baseline, not an advanced technique.
+2. **A timeout on every outbound call, retry with backoff and jitter where the call is idempotent, and a Circuit Breaker in long-lived processes.** This is the baseline, not an advanced technique. Skip what the platform or mesh already does, since retries multiply.
 3. **Assume at-least-once delivery.** Design consumers to be idempotent from day one; retrofitting idempotency after duplicate charges is not a pleasant project.
 4. **Transactional Outbox whenever a write must produce an event.** "Save then dispatch" loses events.
 5. **Dead letter channel configured before launch.** Otherwise poison messages either block the queue or vanish.

@@ -1,0 +1,9 @@
+{
+  "name": "@acme/invoices-client",
+  "version": "2.4.1",
+  "description": "Published client for the Acme Invoices API",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": { "node": ">=20" }
+}

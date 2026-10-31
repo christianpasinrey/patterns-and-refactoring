@@ -1,0 +1,6 @@
+- The report names the kind of software (a batch data pipeline), the style (pipes and filters), the concern (input validation), and where it goes because of that.
+- The check is a stage or a pure row function composed in the chain, and `write_partition` does not learn about validity.
+- Held-back rows go to a quarantine output with the reason. One bad row neither stops the run nor vanishes.
+- A missing amount or other malformed row reaches quarantine too, instead of crashing `normalise`.
+- The count of held-back rows is visible, and rerunning a day replaces its quarantine as the partition is replaced, instead of appending.
+- Each stated rule has a test that was seen failing.

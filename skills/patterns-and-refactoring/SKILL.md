@@ -1,6 +1,6 @@
 ---
 name: patterns-and-refactoring
-description: Use before designing or writing any non-trivial code, before any refactor, and when reviewing a design or pull request for structure. Triggers on designing a class, service, module or package; choosing an approach; "how should I structure this"; refactoring, cleaning up, "this code is messy"; legacy migration; adding a feature to tangled code; and reviewing someone else's abstractions. Covers GoF, refactoring techniques, code smells, PoEAA, architectural, DDD, distributed, messaging, concurrency, functional, frontend, security, data evolution, delivery and API design, anti-patterns, testing shapes, and per-stack framework idioms.
+description: Use before designing or writing any non-trivial code, in any stack and any kind of software, before any refactor, and when reviewing a design or pull request for structure. Triggers on designing a class, service, module or package; choosing an approach; "how should I structure this"; refactoring, cleaning up, "this code is messy"; legacy migration; adding a feature to tangled code; and reviewing someone else's abstractions. Covers GoF, refactoring techniques, code smells, PoEAA, architectural, DDD, distributed, messaging, concurrency, functional, frontend, security, data evolution, delivery and API design, anti-patterns, testing shapes, and per-stack framework idioms.
 ---
 
 # Patterns & Refactoring
@@ -27,8 +27,8 @@ Over-applying this skill is itself an anti-pattern. Be honest about the level.
 
 | Level | Looks like | What you produce |
 |---|---|---|
-| **TRIVIAL** | One-line fix, copy change, config value, new field on an existing form, bug fix introducing no abstraction | **Nothing.** Skip this skill and write the code. |
-| **STANDARD** | New service, endpoint, component, job, integration; a refactor across a handful of files | 2–4 lines before coding: *force or smell → choice made → alternative rejected and why* |
+| **TRIVIAL** | One-line fix, copy change, config value, new internal field on an existing form, bug fix introducing no abstraction | **Nothing.** Skip this skill and write the code. |
+| **STANDARD** | New service, endpoint, command, public function, pipeline stage, component, job, integration; any change to a published surface; a refactor across a handful of files | 2–4 lines before coding: *force or smell → choice made → alternative rejected and why* |
 | **ARCHITECTURAL** | New module or bounded context, publishable package, cross-cutting refactor, a decision other code must live with | A **Pattern Decisions** section in the spec or plan, with a Mermaid diagram and the rejected alternatives |
 
 Between two levels? Pick the lower. A missing paragraph is cheap; ceremony on every task gets
@@ -39,20 +39,38 @@ behaviour. Triage what the diff *does*, not what its description says.
 
 ## Step 0.5 — Read the room (every path)
 
-Two lookups before any decision, both cheap:
+Three lookups before any decision, all cheap:
 
 1. **Detect the stack** from the manifest — `composer.json`, `package.json`, `go.mod`,
    `Cargo.toml`, `pyproject.toml`, `Gemfile`, `*.csproj`, `pom.xml` / `build.gradle`,
    `pubspec.yaml`, `Package.swift` — and
    open the matching file in [`references/idioms/`](references/idioms/), at every level above
    TRIVIAL and however long the session has run. The decision's **Framework** line names the
-   file you opened. Do not guess the stack from file extensions.
-2. **Find how this codebase already solves this kind of problem.** Grep for an existing
-   `Actions/`, `Services/`, `Pipelines/`, event, job, or resolver that does something of the
-   same shape. Follow it. Consistency with the codebase beats textbook purity: a second way of
+   file you opened. With no manifest or no matching file, name the language or engine and write
+   `none` on that line. File extensions are the last resort, since they do not name a framework.
+2. **Find how this codebase already solves this kind of problem.** Search for the nearest
+   existing code of the same shape: the same kind of module, command, handler, pipeline stage,
+   job or system. Follow it. Consistency with the codebase beats textbook purity: a second way of
    doing the same thing is a smell you are introducing. If the existing convention is itself a
    smell, say so in the decision rather than silently diverging from it. If there is no
    convention yet, say that too, and default to the framework idiom.
+3. **Place it.** Open [`references/decision-matrix.md`](references/decision-matrix.md), at every
+   level above TRIVIAL, and walk it: the universal concern, the kind of software, the constraint
+   or standard that outranks design, the structure, then the stack's tool. Judge the structure
+   by what the code does (who imports whom, where rules live), never by folder names or labels.
+   The decision's **Placement** line records it, one line per concern.
+
+| Role | Concerns | Lives |
+|---|---|---|
+| Boundary | Identity, input shape, public contract, failure translation | Where the outside enters |
+| Rules | Business rules, permission decisions, input meaning | Free of I/O, wherever this structure keeps them |
+| Flow | Consistency, sequencing, deciding what a failure means | The one place an operation is coordinated |
+| Effects | Persistence, side effects, caching, external systems | Behind what this structure uses for I/O |
+| Runtime | Background work, concurrency, configuration, observability, rollout | Around the code |
+
+The same concern lands in different places: a permission is a model method in framework MVC, a
+domain rule in hexagonal, and in a library it is the caller's. Follow the structure the project
+has, and treat adding a place it does not have as a decision to justify.
 
 ---
 
@@ -75,7 +93,7 @@ nameable force means no pattern — write the direct code.
 1. **What varies?** Which part will have a second, third, fourth version?
 2. **Who wants it to vary?** A requirement, a third-party API, a customer tier, a platform, a test double? "It might be nice" is not a source; a named source is.
 3. **What must not move?** Which callers, contracts, or stored data must survive untouched?
-4. **When does it vary?** Compile time, boot time, per request, per user, mid-flight? Runtime variation demands a different pattern from configuration-time variation.
+4. **When does it vary?** Compile time, boot time, per request, per user, per frame, per run, per record, mid-flight? Runtime variation demands a different pattern from configuration-time variation.
 5. **How many axes?** Two independent axes (abstraction *and* implementation) is a Bridge, not two Strategies bolted together.
 
 Write it as a sentence: *"The payment provider varies per tenant, chosen at runtime, while the
@@ -98,11 +116,11 @@ readable, deletable code. Go to Step 5 and write the NO-PATTERN decision.
 | How messages move between systems | Messaging / integration | [distributed-patterns.md](references/distributed-patterns.md#messaging-and-integration) |
 | How work runs in parallel or asynchronously | Concurrency | [concurrency-patterns.md](references/concurrency-patterns.md) |
 | How data is transformed and errors are carried | Functional | [functional-patterns.md](references/functional-patterns.md) |
-| How UI components, state, and rendering are organised | Frontend | [frontend-patterns.md](references/frontend-patterns.md) |
+| How web UI components, state, and rendering are organised (native UI: [architectural.md](references/architectural.md#presentation-architectures) and the stack's idioms file) | Frontend | [frontend-patterns.md](references/frontend-patterns.md) |
 | Who may do what, and where trust ends | Security | [security-patterns.md](references/security-patterns.md) |
 | How stored data and schemas change while the system runs | Data evolution | [data-evolution.md](references/data-evolution.md) |
 | How a change reaches production safely | Delivery | [delivery-patterns.md](references/delivery-patterns.md) |
-| What a public interface promises to its callers | API design | [api-design.md](references/api-design.md) |
+| What a network API promises to its callers (a library or CLI keeps only its compatibility tables) | API design | [api-design.md](references/api-design.md) |
 
 ### Fast routing from a stated force
 
@@ -161,7 +179,7 @@ Read [framework-idioms.md](references/framework-idioms.md) before writing patter
 It routes to the per-stack file from Step 0.5 and carries a cross-stack table of where each
 ecosystem hides the same pattern: Spring's `*Template` classes *are* Template Method, .NET's
 `DbSet<T>` *is* a Repository, Laravel's `Pipeline` and Go's `http.Handler` wrapping *are*
-Chain of Responsibility, Laravel's `Notification::via()` *is* the channel Strategy.
+Chain of Responsibility, Django's `EMAIL_BACKEND` *is* a channel Strategy.
 
 Then check the codebase's own idiom (Step 0.5). If it already resolves strategies, dispatches
 events, or runs pipelines one way, use that way. Naming the pattern the framework or the
@@ -173,13 +191,16 @@ A pattern must pass **all four**. Any failure means write the direct code and re
 
 1. **Rule of Three.** Do two variants exist *today*, with a third concretely foreseen? One implementation plus a hypothetical is a guess, not an axis of change.
 2. **Named source of variation.** Point at the requirement, API, tenant, or platform forcing it. "For flexibility" is not a source.
-3. **The cost is paid back.** Indirection costs files, names, and a longer path from symptom to cause when debugging. Does the variation buy that back?
+3. **The cost is paid back.** Indirection costs files, names, a longer path from symptom to cause when debugging and, where budgets are tight, runtime, memory or binary size. Does the variation buy that back?
 4. **The direct version is genuinely worse.** Write the naive version in your head. If it is clear and easy to change later, it wins.
 
 Full failure modes — speculative generality, Singleton as a disguised global, factories of
 factories, pattern-name theatre — in [antipatterns.md](references/antipatterns.md).
 
-**Refactoring into a pattern later is normal and cheap. Guessing wrong up front is neither.**
+**Refactoring into a pattern later is normal and cheap where you can change every caller.
+Guessing wrong up front is neither.** On a published surface (a library API, a plugin contract,
+a CLI flag, a shipped client) later means a breaking release, so weigh that in gate 3, and count
+a documented extension point as a named source of variation.
 
 ### When someone asks you to "make it extensible"
 
@@ -187,7 +208,7 @@ A tech lead, a PM, or a ticket asking for extensibility does not change the gate
 what you say. Answer with the *seam*, not the abstraction:
 
 1. **Separate what is stable from what would vary** — the query from the writer, the rule from the channel, the calculation from the format — as two plain functions or classes with no interface between them. The seam lives where the codebase already puts that kind of logic; with no convention, in the smallest scope that keeps it callable, usually a private method of the caller.
-2. **Name the trigger for the abstraction:** "When the second format has a ticket, this becomes a Strategy; the seam is already where the interface would go."
+2. **Name the trigger for the abstraction:** "When a second format is actually required, this becomes a Strategy; the seam is already where the interface would go."
 3. **Explain why waiting is safer:** an interface designed from one case is the interface the second case cannot satisfy. Designing it from two real cases costs less than designing it twice.
 
 That is extensibility delivered without paying for it today. A request for extensibility that
@@ -202,18 +223,20 @@ Templates for every level, with worked examples, are in
 
 **NO-PATTERN** — the most common and most valuable outcome. State it; do not skip it:
 
-> **Force:** none today — one provider, one signature scheme. "Maybe Paddle next year" has no ticket.
+> **Placement:** signature check in a web backend; a forged event moves money; framework MVC → middleware at the boundary.
+> **Force:** none today — one provider, one signature scheme. "Maybe Paddle next year" has no owner.
 > **Choice:** direct code. Header parsing and the HMAC check separated as two plain methods (the seam).
-> **Becomes a pattern when:** a second provider has a ticket → Strategy over the verifier.
+> **Becomes a pattern when:** a second provider is actually required → Strategy over the verifier.
 
 **STANDARD**, in the chat before writing code:
 
+> **Placement:** side effect in a Go backend; none; plain packages, handlers call functions → a function the handler calls.
 > **Force:** notification channels vary per user preference, chosen at runtime; the sending
 > call site must not change.
-> **Pattern:** Strategy, resolved through the container by channel key.
-> **Rejected:** a `match` in the sender — three channels exist today and a fourth is on the
+> **Pattern:** Strategy, one implementation per channel, chosen by key.
+> **Rejected:** a `switch` in the sender — three channels exist today and a fourth is on the
 > roadmap, so the branch would keep growing at one call site.
-> **Framework:** `idioms/laravel-php.md` read: notification channels already do this — extending `via()`, not a resolver.
+> **Framework:** `idioms/go.md` read: no framework mechanism here, so a one-method interface declared by the sender.
 
 **ARCHITECTURAL**: a `Pattern Decisions` section in the spec or plan, one entry per decision in
 the ADR shape from `decision-templates.md`, with a Mermaid diagram of the structure.
@@ -248,7 +271,7 @@ Non-negotiable. Refactoring without a safety net is editing and hoping.
 
 - Tests exist → **run them now**, show the result, and confirm they cover the target. "The suite is probably green" is not a result.
 - Tests do not exist → write **characterization tests** first: capture what the code does *now*, bugs included. Do not fix behaviour in the same step.
-- No test runner available (no `vendor/`, no `node_modules`) → a plain script that executes the pinned cases and exits non-zero on drift is a valid safety net. Keep the cases in a file the real runner can consume later.
+- No test runner available (dependencies not installed) → a plain script that executes the pinned cases and exits non-zero on drift is a valid safety net. Keep the cases in a file the real runner can consume later. If the code cannot run here at all (missing toolchain or target hardware), use a host-side harness, and if none is possible say the net is unverified.
 - The code is untestable → that is the first refactoring. Break the dependency (extract an interface, introduce a seam), then test, then continue.
 - A bug is discovered or reported alongside the refactor → **pin the buggy behaviour**, finish the refactoring, then fix the bug in its own commit and move the pinned expectation *in that commit*. If the correct behaviour is ambiguous, ask; when nobody can answer, fix only the unambiguous part, keep the rest pinned, make the fix the last and droppable checkpoint, and state the assumption in it.
 
@@ -319,8 +342,9 @@ run in reverse, per abstraction.
 
 ## Step 1 — Behaviour first
 
-Read the diff for what it *does* before what it *is*. Swallowed exceptions, null paths, missing
-bindings, loose comparisons on magic values — these outrank every design point and go first in
+Read the diff for what it *does* before what it *is*. Silent failures, unhandled absence, wiring
+that fails at runtime, and whatever this language and domain make dangerous (loose comparisons,
+memory and lifetime bugs, data races, allocation in hot paths) — these outrank every design point and go first in
 the review. This skill covers the design half; it does not excuse skipping the behaviour half.
 
 ## Step 2 — Run the gate backwards on each added abstraction
@@ -366,7 +390,7 @@ abstractions creep in unannounced. Full checklist in
 
 - [ ] **Every new interface or abstract class has two implementations in this change**, or is named in the decision as a deliberate seam with its trigger.
 - [ ] **No generic component with one consumer** — a "reusable" writer, mapper or helper used from one place is inlined until the second consumer exists.
-- [ ] **Every new class is named for a domain concept**, not a mechanism (`PricingRule`, not `PricingStrategyFactoryImpl`).
+- [ ] **Every new type or module is named in the vocabulary of its problem**, not a mechanism (`PricingRule`, not `PricingStrategyFactoryImpl`).
 - [ ] **The rejected alternative did not sneak back in** — no `match` beside the Strategy, no wrapper beside the framework feature the decision chose.
 - [ ] **Every item requested maps to its proof** — a test or check per item, listed one by one. An item without proof is reported as not done.
 - [ ] **Tests exercise the axis of change** — one test per variant, wrapping order, listener plus wiring, or the pinned cases still green — and **they ran**. No runner installed → say so and show the lint or type check; never report tests as passing without a run.
@@ -374,7 +398,7 @@ abstractions creep in unannounced. Full checklist in
 - [ ] **File count matches the level** — a STANDARD decision that produced eight files is over-engineering or an undeclared ARCHITECTURAL one.
 - [ ] **The direct version, re-sketched now, is still worse.** If not, simplify before reporting done.
 
-Report the audit in the five-line shape from `decision-templates.md`, including "nothing to
+Report the audit in the six-line shape from `decision-templates.md`, starting with Placement, including "nothing to
 change". An audit that only ever says "all good" is not being run.
 
 ---
@@ -428,5 +452,5 @@ without needing to know they exist.
 Pattern, smell and refactoring taxonomies follow [refactoring.guru](https://refactoring.guru)
 by Alexander Shvets, building on *Design Patterns* (Gamma, Helm, Johnson & Vlissides, 1994) and
 Martin Fowler's *Refactoring*. Further catalogues credited in each reference file. All text
-here is original; for illustrated explanations and full PHP examples, go to the source:
-<https://refactoring.guru/design-patterns/php>.
+here is original; for illustrated explanations and code examples in several languages, go to the source:
+<https://refactoring.guru/design-patterns/examples>.

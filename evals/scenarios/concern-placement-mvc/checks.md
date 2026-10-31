@@ -1,0 +1,4 @@
+- The report names the two concerns (authorization, notification), the project's architecture style, and where each concern goes because of that style.
+- The permission check uses the framework's own mechanism or sits at the view or model, with no port, use-case class or other new layer.
+- The email uses the framework's mail API directly or through a signal. No mailer interface with one implementation.
+- Each stated rule has a test that was seen failing.

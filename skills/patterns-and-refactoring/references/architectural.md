@@ -106,7 +106,7 @@ gives you two-way binding, MVVM. Otherwise MVC and stop thinking about it.
 
 - **Intent** — Decompose processing into independent stages connected by a uniform data contract.
 - **Use when** — ETL, media processing, import pipelines, HTTP middleware, validation chains.
-- **Related** — Chain of Responsibility at class level; Laravel's `Pipeline`; Unix pipes.
+- **Related** — Chain of Responsibility at class level; middleware stacks; Unix pipes.
 - **Cost** — Debugging is harder when a value is wrong three stages down. Make each stage pure and independently testable and this is cheap.
 
 ---
@@ -123,7 +123,7 @@ gives you two-way binding, MVVM. Otherwise MVC and stop thinking about it.
 
 - **Intent** — Replace a legacy system incrementally by routing slices of traffic to the new implementation until nothing is left of the old.
 - **Use when** — Any rewrite of a system that must stay live. The alternative — big-bang rewrite — is the single most reliable way to fail.
-- **How** — Put a facade/router in front, migrate one capability at a time, keep both running, delete the old path only once traffic is zero.
+- **How** — Put a facade/router in front, migrate one capability at a time, keep both running, delete the old path only once nothing uses it.
 - **Cost** — Two systems and a router to maintain during the transition, plus data synchronisation between them.
 
 ### Anti-Corruption Layer

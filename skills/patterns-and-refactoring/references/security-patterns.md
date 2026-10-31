@@ -34,7 +34,7 @@ hand-built login, fails it like any other abstraction.
 - **How** — Answer the four questions from the OWASP cheat sheet: what are we working on, what can go wrong, what are we going to do about it, did we do a good enough job. Sketch a data flow diagram with its trust boundaries, then walk each flow that crosses one through STRIDE as a prompt list.
 - **Output** — Add it to the decision: *threat → mitigation*, or *threat → accepted, by whom*. An accepted risk with an owner is a valid result; an unexamined one is not.
 - **Cost** — A focused session per feature, and a model that has to be updated as the system changes or it becomes misleading.
-- **Not when** — TRIVIAL work, or a change that crosses no boundary and touches no new data. Tie it to triage: ARCHITECTURAL work always, STANDARD work when it adds an endpoint, an integration, a file upload, or a new class of personal data.
+- **Not when** — TRIVIAL work, or a change that crosses no boundary and touches no new data. Tie it to triage: ARCHITECTURAL work always, STANDARD work when it adds an entry point, an integration, an input parser or upload, or a new class of personal data.
 
 STRIDE names what each threat attacks: spoofing (authentication), tampering (integrity),
 repudiation (accountability), information disclosure (confidentiality), denial of service
@@ -45,7 +45,7 @@ repudiation (accountability), information disclosure (confidentiality), denial o
 ## Trust boundaries
 
 - **Force** — Data and callers change trust level when they cross from one owner to another, and something has to check them at that crossing.
-- **How** — List the crossings: browser to server, tenant to tenant, service to service, webhook, queue consumer, admin tool, third-party response, and stored content another user wrote. Check once at each crossing, then carry a typed, validated value inward so inner code does not repeat the work.
+- **How** — List the crossings for this kind of software: browser to server, tenant to tenant, service to service, webhook, queue consumer, admin tool, third-party response, and stored content another user wrote; on local software, arguments, parsed files, IPC, deep links, plugins and device input. Check once at each crossing, then carry a typed, validated value inward so inner code does not repeat the work.
 - **Cost** — Internal callers need real credentials, every crossing needs an owner, and service-to-service checks add latency.
 - **Not when** — Two modules in one process acting for the same principal. A function call is not a trust boundary; revalidating at every layer is noise that hides the checks that matter.
 
@@ -160,7 +160,7 @@ that a second tenant's data is absent, as in
 
 ## Secrets
 
-- **Force** — A process needs a credential that must not live in the repository, the image or the logs, and whose useful life after a leak must be short.
+- **Force** — A process needs a credential that must not live in the repository, the image or the logs, and whose useful life after a leak must be short. Software on users' devices cannot keep a shared secret: use per-user or per-device credentials, the platform keystore, or a backend that holds it.
 - **How** — Pick the strongest delivery your platform supports, scope each secret to one service and one environment, automate rotation, and audit reads.
 - **Cost** — A secret store is one more critical dependency, and rotation has to be rehearsed before it is needed.
 - **Not when** — A secret store is not worth it for one small application on one host, provided the secret stays out of the repository, is scoped, and can be rotated.
@@ -184,7 +184,7 @@ neither does restarting the application. Revoke first, then clean up.
 ## Input handling
 
 - **Force** — External data reaches interpreters, queries, templates and object binders that treat some of it as instructions.
-- **How** — Validate on the server against an allowlist of what is acceptable, checking syntax (format, type) and semantics (does this make sense for this operation). Then apply the control belonging to the *sink*: validation and output handling are separate defences.
+- **How** — Validate on the trusted side of the boundary against an allowlist of what is acceptable, checking syntax (format, type) and semantics (does this make sense for this operation). Then apply the control belonging to the *sink*: validation and output handling are separate defences.
 - **Cost** — Schemas to maintain, and legitimate input rejected when rules are guessed. Blocking apostrophes rejects real names and fixes nothing.
 - **Not when** — Do not escape on the way in. Encoding at input assumes one output context and corrupts stored data; keep the value intact and encode at output.
 

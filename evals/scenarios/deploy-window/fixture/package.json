@@ -1,0 +1,14 @@
+{
+  "name": "hookrelay",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "migrate": "node-pg-migrate up",
+    "start:web": "node dist/web/server.js",
+    "start:worker": "node dist/worker/deliver.js"
+  },
+  "dependencies": {
+    "node-pg-migrate": "^7.0.0",
+    "pg": "^8.11.0"
+  }
+}

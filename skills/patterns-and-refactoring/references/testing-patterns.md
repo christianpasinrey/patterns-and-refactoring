@@ -27,7 +27,7 @@ extra files.
 | **Observer / events** ([catalogue](gof-catalog.md#observer)) | Each listener in isolation with a hand-built event, plus one **wiring** assertion that the event is dispatched (`Event::fake()`-style) and one that the listener is registered | Assert side effects through the whole event chain; that pins the wiring *and* every listener in one brittle test |
 | **State** ([catalogue](gof-catalog.md#state)) | A **transition table** test: every legal transition succeeds, every illegal one throws or is refused, and the object's behaviour differs per state | Test transitions only via the happy path; the illegal transitions are the rule being enforced |
 | **Chain / pipeline / middleware** ([catalogue](gof-catalog.md#chain-of-responsibility)) | Each handler alone (handles, passes, or short-circuits), plus one test of the **full chain's order** and one for "nobody handled it" | Assume order; it is the classic silent bug in this pattern |
-| **Command / job** ([catalogue](gof-catalog.md#command)) | Runs twice, one effect (**idempotent on retry**); serialises and deserialises without losing state; failure path leaves no half-applied change | Test only a single successful run; queues retry |
+| **Command / job** ([catalogue](gof-catalog.md#command)) | If queued or retried: runs twice, one effect (**idempotent on retry**), and serialises without losing state. If in-process: execute then undo restores the prior state. Either way, the failure path leaves no half-applied change | Test only a single successful run; queues retry |
 | **Adapter / Gateway / ACL** ([catalogue](gof-catalog.md#adapter)) | A **contract test** against recorded real responses (fixtures), covering the error shapes too; one **live smoke test** run on demand, not in CI | Mock the SDK's internals. You then test your assumptions about the vendor, which is what the adapter exists to isolate |
 | **Repository / query object** ([catalogue](enterprise-patterns.md#repository)) | An **integration test against the real database**, in a transaction that rolls back | Mock the repository to unit-test the service. That mostly tests that the mock agrees with itself |
 | **Template Method** ([catalogue](gof-catalog.md#template-method)) | Through **concrete subclasses**, each proving its steps run in the skeleton's order | Test the abstract class through a test-only subclass; that pins the hooks, which are the fragile part |
@@ -75,7 +75,7 @@ shapes:
 
 ### Characterization tests
 
-- **Shape** — A generator over representative inputs; run the *current* code; freeze the actual outputs into a cases file; a test that replays the cases with **strict equality, including types**. `0` and `0.0` are different results, and Extract Method with a return type will silently change one into the other.
+- **Shape** — A generator over representative inputs; run the *current* code; freeze the actual outputs into a cases file; a test that replays the cases with **strict equality, including types**. `0` and `0.0` are different results, and Extract Method with a return type will silently change one into the other. For numeric or stochastic output, fix the seeds and compare within a stated tolerance.
 - **Coverage target** — Every branch you intend to touch, plus the boundaries around it (empty input, zero, null, the largest realistic case). Not every path in the file.
 - **The pinned bug** — When a case captures wrong behaviour, it stays pinned through the whole refactor. Its expectation moves in exactly one commit: the fix. If the correct behaviour is ambiguous, it does not move at all until someone decides.
 - **Do NOT** — Write the expected values by hand from the spec. That is a test of the spec, and it will fail on the first divergence, which is the moment you most need it green.
@@ -88,7 +88,7 @@ shapes:
 
 ### No runner installed
 
-The absence of `vendor/` or `node_modules` is not the absence of a safety net.
+Dependencies that are not installed are not the absence of a safety net.
 
 - Put the cases in a plain data file. Write a plain script that loads it, runs the code, compares strictly, and exits non-zero on drift. Run it after every step.
 - Write the real test class against the same cases file so CI consumes it later without rewriting the cases.
@@ -103,7 +103,7 @@ once". If the tests do not pin it, the next refactor removes it without noticing
 
 | Constraint | Assert on | Never assert on |
 |---|---|---|
-| **Memory / streaming** | The query count with N+1 rows over the chunk size (chunking happened); the return type is a `Generator` / iterator; the first row arrives before the last is loaded | `memory_get_usage()` or wall-clock memory. Environment-dependent, flaky, and it measures the runtime, not your design |
+| **Memory / streaming** | The query count with N+1 rows over the chunk size (chunking happened); the return type is a `Generator` / iterator; the first row arrives before the last is loaded | Process memory readings, unless memory is a hard budget on a fixed target. Environment-dependent, flaky, and it measures the runtime, not your design |
 | **Timeouts / retries** | A **fake clock** and a **fake transport**: N failures then success yields N+1 calls with the expected backoff; the final failure surfaces; a `429` honours `Retry-After` | Real sleeps, real network. See [distributed-patterns.md](distributed-patterns.md#retry) |
 | **Concurrency / idempotency** | Run the handler twice with the same message → one effect; run two interleaved → one wins, the other is rejected or merged as designed. See [concurrency-patterns.md](concurrency-patterns.md#idempotency-and-exactly-once) | A single run passing. Duplicates are the case |
 | **Ordering** | The observed **sequence** (a spy recording calls, an outbox table, an event log) | Timestamps or sleeps to force order |
@@ -135,7 +135,7 @@ Tests rot the same way production code does, and the smells have names.
 Where each kind of test earns its place, and the one that usually does not.
 
 - **Unit tests** — for pure logic and value objects: pricing rules, parsers, state machines, `Money`. Fast, precise, no doubles needed because the code has no collaborators worth doubling. This is where a Domain Model pays back.
-- **Integration tests** — with the real database and the real framework, in a rolled-back transaction, for anything that touches the ORM, the container, routing, validation, or events. Slower, and they catch the bugs that actually ship: a missing binding, a wrong column, an N+1, a policy not applied.
+- **Integration tests** — with the real collaborators (database, filesystem, device, engine, framework), resetting state however the store allows, for anything that crosses them. Slower, and they catch the bugs that actually ship: a missing binding, a wrong column, an N+1, a policy not applied.
 - **End-to-end** — a handful, at the boundary (HTTP, CLI, queue), proving the wiring for the critical paths. Expensive; keep them few and stable.
 
 **The mocked-repository unit test is usually the worst of the three.** It is slower to write

@@ -10,8 +10,8 @@
       "name": "patterns-and-refactoring",
       "source": "./",
       "displayName": "Patterns & Refactoring",
-      "description": "Forces a deliberate design decision before non-trivial code is written, a test-backed process before code is restructured, a structured review of someone else's abstractions, and an audit of what was actually built. Ships the patterns-and-refactoring skill: 22 GoF patterns, 66 refactoring techniques, 22 code smells, enterprise/architectural/DDD/distributed/concurrency/functional/frontend/security/data-evolution/delivery/API-design catalogues, anti-patterns, testing patterns, decision templates and framework idioms for 22 stacks.",
-      "version": "1.2.1",
+      "description": "For any kind of software and any stack: forces a deliberate design decision before non-trivial code is written, a test-backed process before code is restructured, a structured review of someone else's abstractions, and an audit of what was actually built. Ships the patterns-and-refactoring skill: 22 GoF patterns, 66 refactoring techniques, 22 code smells, enterprise/architectural/DDD/distributed/concurrency/functional/frontend/security/data-evolution/delivery/API-design catalogues, anti-patterns, testing patterns, decision templates and framework idioms for 22 stacks.",
+      "version": "1.3.0",
       "category": "development",
       "tags": [
         "design-patterns",

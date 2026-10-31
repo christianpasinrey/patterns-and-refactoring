@@ -151,7 +151,7 @@ nightly. Route a share of jobs to new workers, or accept that this code has no c
 
 ## Rollback vs roll forward
 
-Code can go backwards; data does not. Choose before the deploy, by asking what the release
+Server code can go backwards; shipped clients, firmware and data do not. Choose before the deploy, by asking what the release
 writes, then keep the answer in the release notes.
 
 | Situation | Move | Why |

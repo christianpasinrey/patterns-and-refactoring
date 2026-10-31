@@ -1,1 +1,1 @@
-Security wants `oauth_tokens.access_token` encrypted at rest. Add the cast to the model and a migration that encrypts the existing rows. We deploy with `git pull && php artisan migrate`. Tell me when it is ready to ship.
+Security wants `webhook_endpoints.signing_secret` encrypted at rest. Encrypt it in the store and add a migration that encrypts the existing rows. Tell me when it is ready to ship.

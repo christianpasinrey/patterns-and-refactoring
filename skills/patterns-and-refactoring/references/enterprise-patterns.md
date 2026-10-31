@@ -48,10 +48,10 @@ applications. Data Mapper wins when the domain model must diverge from the table
 when the domain must be unit-testable with no database, or when the schema is legacy and ugly
 while the domain must be clean.
 
-Do not mix them arbitrarily. If you are on Eloquent, the natural design is Active Record plus a
-Service Layer — not Eloquent hidden behind a Repository pretending to be a Data Mapper, which
-gives you the cost of both and the benefit of neither. See
-[idioms/laravel-php.md](idioms/laravel-php.md#repository-over-eloquent-when-is-it-justified).
+Do not mix them arbitrarily. On an Active Record ORM (Eloquent, Rails, Django), the natural design
+is Active Record plus a Service Layer — not the ORM hidden behind a Repository pretending to be a Data Mapper, which
+gives you the cost of both and the benefit of neither. The stack's idioms file has the
+specifics; [idioms/laravel-php.md](idioms/laravel-php.md#repository-over-eloquent-when-is-it-justified) is a worked case.
 
 ---
 
@@ -59,11 +59,11 @@ gives you the cost of both and the benefit of neither. See
 
 | Pattern | Solves | Note |
 |---|---|---|
-| **Unit of Work** | Track changed objects, write them in one transaction | Doctrine's `EntityManager`. In Laravel, `DB::transaction()` is the poor man's version |
-| **Identity Map** | One in-memory instance per row per request | Prevents two objects representing the same row from diverging. Eloquent does *not* do this by default — a real source of bugs |
-| **Lazy Load** | Defer loading until accessed | Eloquent relations. The N+1 query problem is Lazy Load's failure mode; eager loading is the cure |
+| **Unit of Work** | Track changed objects, write them in one transaction | Hibernate's `Session`, EF Core's `DbContext`, Doctrine's `EntityManager`. Active Record ORMs offer a transaction block instead, the poor man's version |
+| **Identity Map** | One in-memory instance per row per request | Prevents two objects representing the same row from diverging. Hibernate and EF Core do this per session; Eloquent, Rails and Django do *not* — a real source of bugs |
+| **Lazy Load** | Defer loading until accessed | ORM relations in most stacks. The N+1 query problem is Lazy Load's failure mode; eager loading is the cure |
 
-**Identity Map is the one most people do not realise they lack.** In Eloquent, loading the same
+**Identity Map is the one most people do not realise they lack.** In Eloquent, Rails or Django, loading the same
 row twice gives two objects; mutating one does not affect the other, and whichever saves last
 wins. Within a request that touches the same entity from several paths, this bites.
 

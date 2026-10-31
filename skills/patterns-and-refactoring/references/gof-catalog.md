@@ -43,14 +43,14 @@ that actually prevent bad decisions, so read those before committing.
 - **Force** — Construction is expensive, or the exact runtime configuration of an object is not reproducible from a constructor.
 - **Use when** — Cloning a fully configured object is genuinely cheaper or safer than rebuilding it: parsed documents, pre-warmed connections, editor objects being duplicated by the user.
 - **Do NOT use when** — Construction is cheap. This is the least-used GoF pattern in modern code for good reason.
-- **Cost** — Deep versus shallow copy is a permanent source of bugs. Circular references need explicit handling. In PHP, `__clone()` must be written and maintained carefully.
+- **Cost** — Deep versus shallow copy is a permanent source of bugs. Circular references need explicit handling. Language clone hooks (`__clone()`, `Clone`, `copy`) must be written and maintained carefully.
 
 ### Singleton
 
 - **Intent** — Ensure a class has one instance and provide a global access point to it.
 - **Force** — Genuinely one shared resource *and* a need for global reach.
 - **Use when** — Almost never in application code. See [antipatterns.md](antipatterns.md#singleton).
-- **Do NOT use when** — You want convenient access to a shared service. That is dependency injection, and your container already gives you a single instance without the global.
+- **Do NOT use when** — You want convenient access to a shared service. That is dependency injection: one instance created at startup and passed in, with no global.
 - **Cost** — Hidden dependencies, hostile to tests, unsafe under concurrency, and impossible to have two of when requirements change. The two legitimate needs it bundles — *one instance* and *global access* — should be separated: keep the first, refuse the second.
 
 ---
@@ -128,7 +128,7 @@ that actually prevent bad decisions, so read those before committing.
 
 - **Intent** — Pass a request along a chain of handlers until one handles it.
 - **Force** — The set and order of processing steps varies, and the sender must not know who will handle it.
-- **Use when** — Middleware, validation chains, escalation, event filters. Laravel's `Pipeline` is this pattern.
+- **Use when** — Middleware, validation chains, escalation, event filters. Servlet filters, ASP.NET Core middleware and Laravel's `Pipeline` are this pattern.
 - **Do NOT use when** — Exactly one handler always handles it. Call it directly.
 - **Cost** — No guarantee anyone handles the request; silent drops are the classic bug. Chains are hard to trace — log which handler took it.
 
@@ -136,7 +136,7 @@ that actually prevent bad decisions, so read those before committing.
 
 - **Intent** — Turn a request into a stand-alone object carrying all information about it.
 - **Force** — Requests need a life of their own: queued, logged, retried, undone, scheduled, permission-checked.
-- **Use when** — Job queues, undo/redo, transactional operations, audit trails, CLI actions. Laravel's queued jobs and Vue/Redux action objects are Commands.
+- **Use when** — Job queues, undo/redo, transactional operations, audit trails, CLI actions. Queued jobs and Redux action objects are Commands.
 - **Do NOT use when** — You just need to call a method. A Command that is only ever executed immediately, once, with no metadata, is a method call with extra files.
 - **Cost** — One class per action. Fine when the metadata earns it, noise when it doesn't.
 
@@ -144,7 +144,7 @@ that actually prevent bad decisions, so read those before committing.
 
 - **Intent** — Traverse elements of a collection without exposing its underlying representation.
 - **Force** — Traversal must be decoupled from structure, or several traversal orders are needed.
-- **Use when** — Custom aggregates, paginated APIs, streaming large result sets (PHP `Generator`, `IteratorAggregate`).
+- **Use when** — Custom aggregates, paginated APIs, streaming large result sets (Python and PHP generators, C# `IEnumerable`, Rust `Iterator`).
 - **Do NOT use when** — An array or a first-class collection type already does it. Every mainstream language ships this pattern built in.
 - **Cost** — Almost none, because you rarely implement it from scratch. Use the language's interfaces.
 
@@ -236,7 +236,7 @@ Not in refactoring.guru's catalogue, and rightly deprioritised — but worth kno
 
 ## Source
 
-Taxonomy from <https://refactoring.guru/design-patterns/catalog>, with PHP implementations —
-both conceptual and real-world — at <https://refactoring.guru/design-patterns/php>. Original
+Taxonomy from <https://refactoring.guru/design-patterns/catalog>, with implementations in several languages —
+both conceptual and real-world — at <https://refactoring.guru/design-patterns/examples>. Original
 source: *Design Patterns: Elements of Reusable Object-Oriented Software*, Gamma, Helm, Johnson
 & Vlissides, 1994. This file is original commentary, not a reproduction of either.

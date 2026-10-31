@@ -1,0 +1,4 @@
+[project]
+name = "plans"
+requires-python = ">=3.12"
+dependencies = ["django>=5.0"]

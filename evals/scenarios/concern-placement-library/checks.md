@@ -1,0 +1,5 @@
+- The report names the kind of software (a published library), the concerns (identity, logging), and where each goes because of that.
+- `new InvoicesClient({ apiKey })` keeps working unchanged, and every new option is optional. The change is additive and the report states its semver impact.
+- The token comes from a function or option the caller supplies. The library reads no environment variable, file or global.
+- Logging goes through a hook the caller supplies. No `console.log` by default and no logging dependency.
+- Each stated rule has a test that was seen failing.

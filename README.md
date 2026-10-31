@@ -5,10 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-skill-8A63D2)](https://docs.claude.com/en/docs/claude-code)
 [![Plugin](https://img.shields.io/badge/plugin-patterns--and--refactoring%40christianpasinrey-8A63D2)](#recommended--plugin-from-the-marketplace)
-[![Version](https://img.shields.io/badge/version-1.2.1-8A63D2)](#changelog)
+[![Version](https://img.shields.io/badge/version-1.3.0-8A63D2)](#changelog)
 [![Standalone](https://img.shields.io/badge/dependencies-none-brightgreen)](#installation)
 [![Catalogues](https://img.shields.io/badge/catalogues-12-blue)](#whats-inside)
-[![References](https://img.shields.io/badge/reference%20files-42-blue)](#repository-layout)
+[![References](https://img.shields.io/badge/reference%20files-43-blue)](#repository-layout)
 [![Stacks](https://img.shields.io/badge/framework%20idioms-22%20stacks-blue)](#whats-inside)
 
 > [!NOTE]
@@ -149,7 +149,7 @@ flowchart TD
 
 > **Consistency with the codebase beats textbook purity.**
 
-Every path starts with two cheap lookups. First, detect the stack from the manifest (`composer.json`, `package.json`, `go.mod`, `Cargo.toml`, `pyproject.toml`, `Gemfile`, `*.csproj`, `pom.xml`), never from file extensions, and open that stack's idioms file. Second, find how *this* codebase already solves this kind of problem (an existing `Actions/`, pipeline, event, job or resolver) and follow it. A second way of doing the same thing is a smell you are introducing. If the existing convention is itself a smell, the decision says so rather than quietly diverging.
+Every path starts with three cheap lookups. First, detect the stack from the manifest (`composer.json`, `package.json`, `go.mod`, `Cargo.toml`, `pyproject.toml`, `Gemfile`, `*.csproj`, `pom.xml`), never from file extensions, and open that stack's idioms file. Second, find how *this* codebase already solves this kind of problem (an existing `Actions/`, pipeline, event, job or resolver) and follow it. A second way of doing the same thing is a smell you are introducing. If the existing convention is itself a smell, the decision says so rather than quietly diverging. Third, place it with the [decision matrix](skills/patterns-and-refactoring/references/decision-matrix.md): the concern, the kind of software, what must not break, where this structure keeps it, and the stack's tool. Structures are judged by what the code does, not by their labels.
 
 Reviewers re-triage on their own: a PR labelled "just structure" gets triaged by what the diff *does*, not what its description says.
 
@@ -220,10 +220,11 @@ Twelve catalogues, cross-referenced, with original commentary focused on **cost*
 | Delivery | Deploy order, workers, flags, rollout, rollback | [`delivery-patterns.md`](skills/patterns-and-refactoring/references/delivery-patterns.md) |
 | API design | Resources, versioning, idempotency, contracts | [`api-design.md`](skills/patterns-and-refactoring/references/api-design.md) |
 
-Plus seven files that exist to keep the rest honest:
+Plus eight files that exist to keep the rest honest:
 
 | File | Purpose |
 |---|---|
+| [`decision-matrix.md`](skills/patterns-and-refactoring/references/decision-matrix.md) | The matrix behind every decision: universal concern → kind of software → constraints and standards → structure → stack. Works for a web backend, a CLI, a library, a game or a kernel driver |
 | [`decision-templates.md`](skills/patterns-and-refactoring/references/decision-templates.md) | The exact shape of every output — NO-PATTERN, STANDARD (both paths), ARCHITECTURAL as a lightweight ADR, the review, the verification report — each with a worked example |
 | [`verification.md`](skills/patterns-and-refactoring/references/verification.md) | The post-implementation audit: abstraction counts, test audit, simplification pass, and the ten shapes that creep into AI-assisted code unannounced |
 | [`testing-patterns.md`](skills/patterns-and-refactoring/references/testing-patterns.md) | Which tests each pattern owes, test doubles and when a mock is a design smell, characterization and approval nets, test smells, the honest pyramid |
@@ -250,7 +251,7 @@ Every entry carries **Cost** and **Do NOT use when**. That is the point of the c
 <details>
 <summary><b>Context cost — how this stays cheap</b></summary>
 
-`SKILL.md` is the routing layer and the only file loaded when the skill triggers (about 28 KB, roughly 7,000 tokens). The 20 reference files and 22 stack files are loaded **on demand**, one at a time, once the relevant family is already narrowed.
+`SKILL.md` is the routing layer and the only file loaded when the skill triggers (about 31 KB, roughly 8,000 tokens). The 21 reference files and 22 stack files are loaded **on demand**, one at a time, once the relevant family is already narrowed.
 
 A typical STANDARD-level decision loads `SKILL.md`, the stack's idioms file, and at most one catalogue. An ARCHITECTURAL decision may load two or three. The full corpus is never loaded at once, and never sits in your context between tasks.
 
@@ -372,7 +373,7 @@ skill.
   is a decision and gets stated too.
 - Never refactor code that has no test coverage without first writing
   characterization tests that pin current behaviour.
-- Never refactor and change behaviour in the same commit.
+- Never refactor and change behaviour in the same commit, or the same PR where merges are squashed.
 - After implementing, run the skill's verification audit (Step 6) and report
   it, including when it finds nothing to change.
 ```
@@ -392,13 +393,13 @@ Once installed, it works without being asked for. Some examples of what changes:
 **Prompt:** *"Add support for sending notifications by SMS as well as email."*
 
 **Without the skill:**
-> Creates `NotificationService` with a `match` on channel, or immediately builds an abstract factory with a channel registry — depending on how the prompt lands.
+> Creates `NotificationService` with a `switch` on channel, or immediately builds an abstract factory with a channel registry — depending on how the prompt lands.
 
 **With the skill:**
 > **Force:** notification channels vary per user preference, chosen at runtime; the sending call site must not change.
-> **Pattern:** Strategy, resolved through the container by channel key.
-> **Rejected:** a `match` in the sender — three channels exist today and a fourth is on the roadmap, so the branch would keep growing at a single call site.
-> **Framework check:** Laravel already has this — extending the `Notification` channel system rather than building a parallel resolver.
+> **Pattern:** Strategy, one implementation per channel, chosen by key.
+> **Rejected:** a `switch` in the sender — three channels exist today and a fourth is on the roadmap, so the branch would keep growing at a single call site.
+> **Framework check:** `idioms/go.md` read: no framework mechanism here, so a one-method interface declared by the sender.
 
 </details>
 
@@ -424,7 +425,7 @@ Once installed, it works without being asked for. Some examples of what changes:
 **Prompt:** *"Add a CSV export of orders to the admin panel. Make it extensible — we might want Excel at some point."*
 
 **Without the skill:**
-> Creates an `ExporterInterface`, a `CsvExporter`, an `ExporterFactory` keyed by format, and a `config/exports.php` with one entry. The factory has one branch.
+> Creates an `ExporterInterface`, a `CsvExporter`, an `ExporterFactory` keyed by format, and an exports config file with one entry. The factory has one branch.
 
 **With the skill:**
 > **Force:** none today. One format, one consumer. "Excel at some point" has no ticket.
@@ -440,13 +441,13 @@ Once installed, it works without being asked for. Some examples of what changes:
 **Prompt:** *"Review PR #412 — it's just structure, quick approve please, standup in 15 minutes."* The PR adds a repository interface with one implementation, a channel strategy factory that ignores its argument, a DTO for an internal call and a static singleton, around a welcome-email service.
 
 **Without the skill:**
-> A list of observations of varying weight, in the order the files were read. Whether the swallowed `\Throwable` is mentioned before the naming nits depends on the run. The direct alternative may or may not appear.
+> A list of observations of varying weight, in the order the files were read. Whether the swallowed exception is mentioned before the naming nits depends on the run. The direct alternative may or may not appear.
 
 **With the skill:**
 > **Verdict:** request changes — two silent-failure bugs, and eight files of scaffolding for a behaviour the framework already ships.
-> **Blocking (behaviour):** `catch (\Throwable) {}` hides a null-user dereference and any mail failure; no container binding for the interface.
-> **Design**, one section per justification the author gave: *"so we can swap the ORM later"* → one implementation, returns Eloquent models, cannot deliver the swap it promises. *"so adding SMS is trivial"* → `Notification::via()` already is that Strategy. *"reachable from anywhere"* → that is the part to refuse.
-> **The direct alternative:** three files, ~25 lines — enum cast, queued `WelcomeNotification`, `onboard(User $user)` — with its force and rejected line.
+> **Blocking (behaviour):** an empty `catch` hides a null-user dereference and any mail failure; no container binding for the interface.
+> **Design**, one section per justification the author gave: *"so we can swap the ORM later"* → one implementation, returns ORM models, cannot deliver the swap it promises. *"so adding SMS is trivial"* → `Notification::via()` already is that Strategy. *"reachable from anywhere"* → that is the part to refuse.
+> **The direct alternative:** three files, ~25 lines — an enum, a queued welcome notification and one `onboard(user)` function — with its force and rejected line.
 > **Nits**, labelled as nits.
 
 </details>
@@ -494,6 +495,7 @@ patterns-and-refactoring/
     └── patterns-and-refactoring/
         ├── SKILL.md              # routing layer — the only always-loaded file
         └── references/
+            ├── decision-matrix.md       # concern → kind → constraints → structure → stack
             ├── decision-templates.md    # output shapes + worked examples
             ├── verification.md          # post-implementation audit
             ├── testing-patterns.md      # what tests each pattern owes
@@ -616,6 +618,33 @@ The result: one repo, one clone, one source of truth. `install.sh`, the manual c
 
 ## Changelog
 
+### 1.3.0 — 2026-10-31
+
+The skill read as a web backend engineer's habit. It now works from what every kind of software shares.
+
+**Added**
+
+- `references/decision-matrix.md`: five questions in order. Which universal concern is this, what does it mean in this kind of software, which constraint or standard outranks design, where does this structure keep it, and which tool does the stack offer. Eleven kinds of software, from web backends to kernels and security agents, and eighteen structures, recognised by what the code does rather than by labels.
+- A required **Placement** line in every decision and in the final report.
+- Scenarios `concern-placement-mvc`, `-hexagonal`, `-library` and `-pipeline`. The same request must land differently per structure.
+
+| Scenario | 1.2.1 | 1.3.0 |
+|---|---|---|
+| Framework MVC: no layer the project lacks | 0 of 2 | 1 of 1 |
+| Hexagonal: rules and I/O in place | 2 of 2 | 1 of 1 |
+| Library: no logging chosen for the caller | 0 of 1 | 2 of 2 |
+| Pipeline: one bad record does not lose the run | 0 of 1 | 2 of 2 |
+
+These are small samples from clean runs, and each run was graded from its report.
+
+**Changed**
+
+- Worked examples now span Go, Python, .NET and TypeScript, and a CLI, a modular monolith and a web service.
+- The gate, triage and audit no longer assume a framework, a server, classes, or a ticket queue. Published surfaces, memory budgets, numeric output, in-process commands and squash merges are covered.
+- Evals no longer come from one stack: fixtures are TypeScript, C#, Go and Python, and `deploy-window` no longer hands the agent its deploy command.
+- The verification report has six lines, opening with Placement.
+- PHP's concurrency notes moved to `idioms/laravel-php.md`.
+
 ### 1.2.1 — 2026-10-31
 
 - `idioms/blender-python.md`: lessons on natural terrain and long headless jobs, from a second round on the showcase scene.
@@ -700,10 +729,10 @@ An entry describing only intent and structure will be asked for revision. That i
 Useful contributions:
 
 - [x] ~~Framework idioms for the major server, frontend and mobile stacks~~ — 22 stacks covered
-- [ ] Framework idioms for stacks not yet covered (Elixir/Phoenix, Unity, Godot, Android)
+- [ ] Framework idioms for stacks not yet covered (Elixir/Phoenix, Unity, Godot, Android, C and C++)
+- [ ] Rows for `decision-matrix.md`: a kind of software or a structure it does not recognise
 - [ ] Eval scenarios that fail on the current skill: a failing scenario is the strongest kind of contribution
 - [ ] Additional anti-patterns with concrete symptoms and cures
-- [ ] More worked examples in `decision-templates.md`, especially ARCHITECTURAL ones from non-PHP stacks
 - [ ] Shapes the verification audit misses — open an issue with the diff it let through
 - [ ] Corrections — particularly where a "do NOT use when" is wrong or too absolute, or where a framework idiom is out of date
 

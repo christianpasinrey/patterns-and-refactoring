@@ -39,7 +39,7 @@ from configuration. Otherwise a function is less code and less indirection.
 
 - **Pipe / Compose** — Build a bigger function from small ones: `pipe(parse, validate, calculate, format)`.
 - **Why** — Each stage is independently testable, and the sequence reads as a description of the process.
-- **Related** — Pipes and Filters at the architectural level; Chain of Responsibility at the class level. Laravel's `Pipeline` and Unix pipes are the same idea.
+- **Related** — Pipes and Filters at the architectural level; Chain of Responsibility at the class level. Middleware stacks and Unix pipes are the same idea.
 
 ---
 
@@ -79,7 +79,7 @@ The highest-value functional patterns for ordinary application code.
 ### Transducer
 
 - **Intent** — Compose transformations without materialising the intermediate collections.
-- **Use when** — Long chains over large datasets where each step allocating a new array is a real cost. In PHP, generators achieve the same result more idiomatically.
+- **Use when** — Long chains over large datasets where each step allocating a new array is a real cost. Where the language has generators, they achieve the same result more idiomatically.
 
 ### Lens / Optics
 
@@ -131,7 +131,7 @@ testable with no mail fake, and the shell is trivial enough not to need tests.
 ## When functional is the wrong call
 
 - **The team does not read it.** Point-free code and heavy currying are illegible to most teams; unread code is unmaintained code.
-- **The language fights you.** PHP has closures, first-class callables and generators, but no pattern matching on sum types and no persistent collections. Force-fitting produces verbose code that reads worse than the imperative version.
+- **The language fights you.** A language with closures but no pattern matching on sum types and no persistent collections, as in much of Java before records, Go or PHP, gives only part of the toolkit. Force-fitting produces verbose code that reads worse than the imperative version.
 - **The domain is genuinely stateful.** A game loop, a UI, a device driver. Model the state honestly and keep the *transitions* pure.
 - **Performance-critical inner loops.** Allocation per stage is real. Measure before choosing elegance.
 

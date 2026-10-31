@@ -65,7 +65,7 @@ correctness, you are pinning behaviour so you will notice if it moves.
 **Generate, don't hand-write.** For a function over data, write a one-off script (kept out of
 the repository; only the cases file and the test are committed) that runs the
 *current* code over 10–20 representative inputs (each branch, each boundary, the empty case) and
-freezes the actual outputs into a cases file. Assert with **strict equality, types included** —
+freezes the actual outputs into a cases file. Assert deterministic output with **strict equality, types included** (numeric or stochastic output: fixed seeds and a stated tolerance) —
 an `int` `0` becoming a `float` `0.0` is exactly the drift a refactor introduces and loose
 equality hides. If no test runner is installed, a plain script that walks the cases file and
 exits non-zero on drift is a valid net; keep the cases in a format the real runner can consume
@@ -88,6 +88,7 @@ makes untestable code testable. In order of preference:
 | **Parameter** | Pass the dependency in instead of constructing it | Cleanest. Change the signature, update callers |
 | **Constructor injection** | Take the collaborator in the constructor, default to the real one | Very low, backward compatible |
 | **Extract Interface + inject** | Interface for the dependency, inject an implementation | Low, and it is the entry point to Strategy/Repository |
+| **Link or build seam** | Swap the module at build time, or pass a function pointer | The normal route in C and embedded code, with no runtime cost |
 | **Extract and override** | Move the untestable call into a `protected` method; override it in a test subclass | Ugly but effective. Fastest route into hostile code |
 | **Container / DI binding** | Rebind the dependency in the test | Free if the framework already resolves it |
 | **Global function shim** | Namespace-local function override, monkey-patching | Last resort. Fragile, and it hides the design problem |
@@ -153,7 +154,7 @@ signature used across the codebase, a public API, a message format, a database s
 
 1. **Expand** — add the new alongside the old. New parameter with a default, new method next to the old, new column next to the old, new API field or version. Nothing existing breaks.
 2. **Migrate** — move callers, consumers and data to the new shape, one at a time, each step shippable.
-3. **Contract** — remove the old once nothing reads it. Verify "nothing" with logs or traffic, not with grep alone.
+3. **Contract** — remove the old once nothing reads it. Verify "nothing" with logs or traffic, not with grep alone. Published software has no such view: remove it at a major version, after a deprecation window.
 
 **Cost** — Two shapes coexist for a while, and the contract step is the one teams forget. Put a
 date or a ticket on it; an expand with no contract is permanent duplication.
@@ -164,7 +165,7 @@ unknown fields, do not depend on ordering) so that expand steps are invisible to
 
 ### Refactoring the schema
 
-Every schema refactoring is Parallel Change across **separate deploys**, because the code and
+Every schema refactoring on a shared store under live traffic is Parallel Change across **separate deploys**, because the code and
 the schema cannot change atomically and a bad migration cannot be reverted cheaply.
 
 ```
@@ -176,7 +177,7 @@ expand (add column/table)  →  backfill  →  verify counts and samples
 - **Before creating an index, check it does not already exist.** A migration that fails halfway leaves the indexes created before the failure in place; re-running it then fails on the first one. Guard every index creation with an existence check.
 - **Before a UNIQUE index, query for duplicates.** If any exist, the index creation fails. Clean the duplicates in the same migration, *before* the index statement, so the migration is self-contained and repeatable.
 - **A rollback undoes the last *successful* migration, not the one that failed.** Check the migration status before suggesting a rollback, and name exactly which migration it will undo.
-- **Production gets no trial-and-error.** Every migration is run against a copy of production data first. "Let's try it and see" is not a step.
+- **Production gets no trial-and-error.** Every migration is run against a copy of production data first, or a representative sample where no copy exists. "Let's try it and see" is not a step. A store embedded in a shipped app is different: it migrates at startup, from any earlier version.
 
 **Sources** — Scott Ambler & Pramod Sadalage, *Refactoring Databases*; Fowler,
 [Parallel Change](https://martinfowler.com/bliki/ParallelChange.html).
@@ -241,10 +242,10 @@ sequencing.
 
 ### Order of operations
 
-1. **Instrument before you change.** Logs, error tracking, and traffic metrics on the paths you intend to touch. You cannot tell whether a migration broke something without a baseline.
+1. **Instrument before you change.** Logs, error tracking, and usage or traffic metrics on the paths you intend to touch. You cannot tell whether a migration broke something without a baseline.
 2. **Pin the boundary, not the internals.** Characterization tests at the HTTP/CLI/queue boundary give the widest coverage per test written. Internal unit tests come later, on the parts you actually refactor.
 3. **Find the seams between capabilities.** Where does the system already have natural joints — separate tables, separate entry points, separate teams? Those are your first extraction candidates.
-4. **Strangler Fig, one capability at a time.** Route a slice of traffic to the new implementation behind a facade. Run both. Compare. Cut over. Delete the old path only when traffic is zero.
+4. **Strangler Fig, one capability at a time.** Route a slice of traffic, users or commands to the new implementation behind a facade. Run both. Compare. Cut over. Delete the old path only when nothing uses it.
 5. **Anti-Corruption Layer at the border.** The legacy model must not leak into the new code. Translate at the boundary, with its own DTOs and mappers, or you will rebuild the legacy design in a new framework.
 6. **Migrate data last and reversibly.** Dual-write or backfill-and-verify. Data migrations are the step that cannot be rolled back cheaply, so they go last and behind a verified read path.
 7. **Delete aggressively.** A modernisation that leaves the old path alive "just in case" has doubled the maintenance surface instead of reducing it. Set a date and remove it.

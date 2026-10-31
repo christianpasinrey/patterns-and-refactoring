@@ -8,8 +8,15 @@ new one.
 |---|---|
 | `requirement-coverage` | One requirement of several silently dropped; tests that never failed |
 | `idiom-lookup` | Guard. The per-stack file is skipped, so its depth goes unused |
-| `deploy-window` | Guard. A storage change breaks long-lived workers between migrate and restart |
+| `deploy-window` | Guard. A storage change breaks long-lived workers during the rollout |
 | `standing-rule` | Guard. The YAGNI gate reopens an architecture rule the project already settled |
+| `concern-placement-mvc` | The same request as the hexagonal scenario gets a layer this project does not have |
+| `concern-placement-hexagonal` | The same request lands in the wrong place for this structure |
+| `concern-placement-library` | A published library decides logging or configuration for its caller |
+| `concern-placement-pipeline` | One bad record stops a batch, or vanishes |
+
+Fixtures span stacks and kinds of software on purpose. A new scenario goes in a stack and kind
+the set does not cover yet, so no single way of working passes for the default.
 
 A guard already passes on the skill as it stands. It stays to catch regressions, and passing it
 is why no rule was written for that failure: guidance with no failing baseline is untested text.
