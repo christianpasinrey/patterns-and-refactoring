@@ -69,6 +69,7 @@ mat = bpy.data.materials.get(name) or bpy.data.materials.new(name)
 |---|---|
 | **Render a low-sample frame through the final camera before any expensive step** | Close-ups pass while the real view fails. Whole scenes can vanish behind one setting |
 | **Set `clip_end` for the scene** | The default is 100 m. A landscape then renders as empty sky while its reflection still shows, and a far-clip arc can pass for a glass artefact |
+| **Point generated normals outwards** | A code-built surface with flipped winding renders as seen from inside. Water then shows total internal reflection: a hard edge near 49 degrees of incidence |
 | **Compare polygons before and after a boolean** | A cut can do nothing, or return an empty mesh that surfaces only as an exporter warning |
 | **Measure instead of squinting** | Dot products for facing, `world_to_camera_view` for framing, `evaluated_get` for real triangle counts, pixel samples for colour |
 | **Isolate before fixing an artefact** | Hide suspects, render flat. Guessed causes are usually wrong: a smudge can be a helper's shadow, and dirt can be a bake halo |
@@ -113,6 +114,8 @@ When the viewer cannot move, detail belongs where it lands on screen, not evenly
 - **Spend nothing on what cannot be seen.** Back faces of distant ranges can stay coarse.
 - **The cost:** the asset is no longer valid from anywhere else. Moving the camera later means
   rebuilding the mesh. That is the trade, so state it in the decision.
+- **Bake what stays still, compute what moves.** Stretching a rendered image to animate it shows
+  its pixels. A shader that derives the surface point from the view direction stays sharp.
 
 ---
 

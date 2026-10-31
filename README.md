@@ -14,6 +14,9 @@
 > [!NOTE]
 > This skill is **standalone**. It needs no MCP server, no other skill, and no runtime. It is Markdown that changes how the model reasons about design. It ships two ways: as a **plugin** from this repo's marketplace (recommended — versioned, updatable) or as a **plain skill directory** copied into `~/.claude/skills`.
 
+<p align="center"><img src="docs/lago-del-pivote.jpg" alt="An alpine lake with clear water, mirrored mountains and volumetric clouds" width="100%"></p>
+<p align="center"><sub>A real-time scene built while distilling <a href="skills/patterns-and-refactoring/references/idioms/blender-python.md"><code>idioms/blender-python.md</code></a>: eroded terrain and sky from Blender, with live water, clouds and light in a WebGL shader. Each failure on the way became a checked lesson.</sub></p>
+
 ---
 
 ## Table of contents
